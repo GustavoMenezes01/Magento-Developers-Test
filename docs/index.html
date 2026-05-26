@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>AD0-E724 — Adobe Commerce Developer Pro</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/dark.css">
+  <style>
+    :root {
+      --theme-color: #e8550e;
+      --sidebar-width: 280px;
+    }
+
+    /* ── Base ── */
+    body { font-family: 'Segoe UI', system-ui, sans-serif; }
+
+    /* ── Navbar as tabs ── */
+    .app-nav {
+      background: #161b22;
+      border-bottom: 2px solid #e8550e;
+      padding: 0 16px;
+      margin: 0;
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: var(--sidebar-width);
+      z-index: 100;
+      height: 48px;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .app-nav p { margin: 0; display: flex; gap: 0; }
+
+    .app-nav a {
+      display: inline-block;
+      padding: 10px 16px;
+      color: #8b949e !important;
+      text-decoration: none !important;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .app-nav a:hover {
+      color: #e6edf3 !important;
+      border-bottom-color: #444c56;
+    }
+
+    .app-nav a.active,
+    .app-nav a[data-active] {
+      color: #e8550e !important;
+      border-bottom-color: #e8550e;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      background: #0d1117;
+      border-right: 1px solid #21262d;
+      padding-top: 56px;
+    }
+
+    .sidebar-nav {
+      padding: 8px 0;
+    }
+
+    .sidebar-nav > ul > li > a {
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #8b949e !important;
+      padding: 6px 20px;
+    }
+
+    .sidebar-nav li a {
+      color: #c9d1d9 !important;
+      padding: 4px 20px;
+      font-size: 0.875rem;
+      border-left: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+
+    .sidebar-nav li a:hover {
+      color: #e6edf3 !important;
+      border-left-color: #444c56;
+    }
+
+    .sidebar-nav li.active > a {
+      color: #e8550e !important;
+      border-left-color: #e8550e;
+    }
+
+    /* ── Content area ── */
+    .content {
+      background: #0d1117;
+      padding-top: 56px !important;
+    }
+
+    .markdown-section {
+      max-width: 900px;
+      color: #c9d1d9;
+    }
+
+    /* ── Headings ── */
+    .markdown-section h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #e6edf3;
+      border-bottom: 2px solid #e8550e;
+      padding-bottom: 10px;
+      margin-top: 0;
+    }
+
+    .markdown-section h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #e6edf3;
+      border-bottom: 1px solid #21262d;
+      padding-bottom: 6px;
+      margin-top: 2rem;
+    }
+
+    .markdown-section h3 {
+      font-size: 1.1rem;
+      color: #ffa657;
+      margin-top: 1.5rem;
+    }
+
+    .markdown-section h4 {
+      font-size: 0.95rem;
+      color: #e8550e;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Tables ── */
+    .markdown-section table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1.2rem 0;
+      font-size: 0.875rem;
+    }
+
+    .markdown-section thead th {
+      background: #161b22;
+      color: #e6edf3;
+      border: 1px solid #30363d;
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .markdown-section tbody td {
+      border: 1px solid #21262d;
+      padding: 7px 12px;
+      color: #c9d1d9;
+    }
+
+    .markdown-section tbody tr:nth-child(even) td { background: #0d1117; }
+    .markdown-section tbody tr:nth-child(odd) td  { background: #161b22; }
+    .markdown-section tbody tr:hover td { background: #1c2128; }
+
+    /* ── Code ── */
+    .markdown-section pre {
+      background: #161b22 !important;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      margin: 1rem 0;
+    }
+
+    .markdown-section code {
+      background: #161b22;
+      color: #ffa657;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.875em;
+    }
+
+    .markdown-section pre code {
+      background: transparent;
+      color: #c9d1d9;
+      padding: 0;
+    }
+
+    /* ── Blockquote / tip boxes ── */
+    .markdown-section blockquote {
+      background: #1c2128;
+      border-left: 4px solid #e8550e;
+      border-radius: 0 6px 6px 0;
+      padding: 12px 16px;
+      margin: 1rem 0;
+      color: #c9d1d9;
+    }
+
+    .markdown-section blockquote strong {
+      color: #e8550e;
+    }
+
+    /* ── Tip / Warning callouts via blockquote prefix ── */
+    .markdown-section blockquote.tip {
+      border-left-color: #3fb950;
+      background: #0f2c1a;
+    }
+
+    .markdown-section blockquote.warning {
+      border-left-color: #d29922;
+      background: #2c1f0a;
+    }
+
+    /* ── Links ── */
+    .markdown-section a {
+      color: #58a6ff;
+      text-decoration: none;
+    }
+    .markdown-section a:hover { text-decoration: underline; }
+
+    /* ── Horizontal rule ── */
+    .markdown-section hr {
+      border: none;
+      border-top: 1px solid #21262d;
+      margin: 2rem 0;
+    }
+
+    /* ── Cover page ── */
+    section.cover {
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1c2128 100%) !important;
+    }
+
+    section.cover .cover-main h1 { color: #e6edf3; }
+    section.cover .cover-main h2 { color: #e8550e; }
+
+    /* ── Search ── */
+    .search input {
+      background: #161b22;
+      border: 1px solid #30363d;
+      color: #e6edf3;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.875rem;
+    }
+
+    .search input:focus { border-color: #e8550e; outline: none; }
+
+    /* ── Progress bar ── */
+    #nprogress .bar { background: #e8550e !important; }
+    #nprogress .peg  { box-shadow: 0 0 10px #e8550e, 0 0 5px #e8550e !important; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0d1117; }
+    ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #444c56; }
+
+    /* ── Sidebar toggle ── */
+    .sidebar-toggle { background: #0d1117; }
+    .sidebar-toggle-button span { background: #8b949e; }
+  </style>
+</head>
+
+<body>
+  <div id="app">Carregando...</div>
+
+  <script>
+    window.$docsify = {
+      name: '<span style="color:#e8550e;font-weight:700;">AD0-E724</span>',
+      nameLink: '/',
+      repo: '',
+      loadNavbar: true,
+      loadSidebar: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      search: {
+        placeholder: 'Buscar...',
+        noData: 'Nenhum resultado.',
+        depth: 3,
+      },
+      copyCode: {
+        buttonText: 'Copiar',
+        errorText: 'Erro',
+        successText: 'Copiado!',
+      },
+      plugins: [
+        function (hook, vm) {
+          // Highlight active navbar link
+          hook.doneEach(function () {
+            var hash = location.hash.replace('#/', '').split('?')[0] || '';
+            document.querySelectorAll('.app-nav a').forEach(function (a) {
+              var href = a.getAttribute('href') || '';
+              href = href.replace('#/', '').replace('.md', '');
+              var isHome = href === '' || href === '/';
+              var isCurrent = hash === '' ? isHome : href !== '' && hash.startsWith(href);
+              a.classList.toggle('active', isCurrent);
+            });
+          });
+        }
+      ]
+    };
+  </script>
+
+  <!-- Docsify core -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+
+  <!-- Search -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+
+  <!-- Copy code button -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@2/dist/docsify-copy-code.min.js"></script>
+
+  <!-- Syntax highlighting -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-php.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-xml-doc.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-graphql.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+</body>
+</html>

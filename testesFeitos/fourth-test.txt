@@ -1,0 +1,1023 @@
+Gustavo Menezes
+Back to exam
+
+Share results
+AD0-E724: Adobe Commerce Developer Professional (Practice Exam)
+You have failed.
+Keep studying and try again. You've got this!
+72%
+Performance Level
+Approaching
+36 / 50 questions
+Required to pass: 39 / 50 (78%)
+Exam Details
+Date: May 19, 2026
+Started: 5:41 pm
+Completed: 6:09 pm
+Time Taken: 28 minutes
+Time Used
+28 / 100 minutes
+Category Performance
+Architecture
+73%
+19/26
+Good understanding
+
+Customizations
+83%
+15/18
+Very good knowledge
+
+Cloud
+33%
+2/6
+Requires additional study
+
+Question Results
+Question 1
+Architecture
+
+Incorrect
+When creating a custom module that needs to be loaded before the Magento_Catalog module, which combination of file contents and locations is correct?
+
+Answer Options
+Your incorrect choice
+
+\Magento\Framework\Component\ComponentRegistrar::register(
+    \Magento\Framework\Component\ComponentRegistrar::MODULE,
+    'Vendor_Module',
+    __DIR__
+);
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="Vendor_Module" setup_version="1.0.0">
+        <sequence>
+            <before name="Magento_Catalog"/>
+        </sequence>
+    </module>
+</config>
+
+\Magento\Framework\Component\ComponentRegistrar::register(
+    \Magento\Framework\Component\ComponentRegistrar::MODULE,
+    'Vendor_Module',
+    __DIR__
+);
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="Vendor_Module" setup_version="1.0.0" before="Magento_Catalog" />
+</config>
+
+\Magento\Framework\Component\ComponentRegistrar::register(
+    \Magento\Framework\Component\ComponentRegistrar::MODULE,
+    'Vendor_Module',
+    __DIR__
+);
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="Vendor_Module" before="Magento_Catalog" />
+</config>
+Correct answer
+
+\Magento\Framework\Component\ComponentRegistrar::register(
+    \Magento\Framework\Component\ComponentRegistrar::MODULE,
+    'Vendor_Module',
+    __DIR__
+);
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="Vendor_Module">
+        <sequence>
+            <module name="Magento_Catalog"/>
+        </sequence>
+    </module>
+</config>
+
+Explanation
+Question 2
+Customizations
+
+Incorrect
+An Adobe Commerce developer is working with the Magento_QuoteConfigurable module and needs to understand its primary purpose.
+
+What is the main function of the Magento_QuoteConfigurable module in relation to configurable product option management?
+
+Answer Options
+Handles the checkout process for configurable products exclusively
+
+Correct answer
+Provides extension points and support for configurable product functionality
+
+Manages inventory validation for configurable product options
+
+Your incorrect choice
+Stores and manages the actual configurable product option selections in the quote
+
+
+Explanation
+Question 3
+Architecture
+
+Correct
+When configuring a product attribute that allows customers to choose several values simultaneously from a predetermined set, which frontend input type should be selected?
+
+Answer Options
+Checkbox
+
+Visual Swatch
+
+Dropdown
+
+Your correct choice
+Multiselect
+
+
+Explanation
+Question 4
+Architecture
+
+Correct
+Which Magento framework class is responsible for handling translatable phrases created with the __() method?
+
+Answer Options
+\Magento\Framework\Locale
+
+\Magento\Framework\I18n
+
+Your correct choice
+\Magento\Framework\Phrase
+
+\Magento\Framework\Translation
+
+
+Explanation
+Question 5
+Cloud
+
+Correct
+A team lead is reviewing an Adobe Commerce Cloud project structure and notices configuration files in both the project root and a `.magento` directory.
+
+Where are Adobe Commerce Cloud configuration files typically located within a project structure?
+
+Answer Options
+In the config directory
+
+Only within the .magento directory
+
+Your correct choice
+In the .magento directory or as files starting with .magento. in project root
+
+Only in the project root directory
+
+
+Explanation
+Question 6
+Architecture
+
+Incorrect
+When implementing a custom module that needs to manage groups of records with filtering, sorting and pagination capabilities, which model type should be used according to best practices?
+
+Answer Options
+Your incorrect choice
+Resource model
+
+Data model
+
+View model
+
+Correct answer
+Collection model
+
+
+Explanation
+Question 7
+Customizations
+
+Correct
+A developer needs to implement validation for a custom checkout field that must match a specific format pattern and also be unique across all customer records.
+
+What is the most comprehensive approach to implement this validation?
+
+Answer Options
+Create only a JavaScript validation rule that handles both format and uniqueness checking via AJAX.
+
+Implement only backend validation that checks both format and uniqueness during order processing.
+
+Override the field template to include both HTML5 pattern validation and a custom uniqueness attribute.
+
+Your correct choice
+Implement JavaScript validation for format checking and backend validation for uniqueness verification.
+
+
+Explanation
+Question 8
+Architecture
+
+Correct
+After completing translations for a custom theme, which process generates the localized static content for different languages and themes?
+
+Answer Options
+bin/magento i18n:pack
+
+bin/magento cache:flush
+
+bin/magento i18n:collect-phrases
+
+Your correct choice
+bin/magento setup:static-content:deploy
+
+
+Explanation
+Question 9
+Customizations
+
+Correct
+A merchant reports that video thumbnails are not generating properly in their Adobe Commerce product gallery. What is the most likely cause of this issue?
+
+Answer Options
+The video URLs contain special characters that prevent thumbnail processing
+
+Your correct choice
+The YouTube API key is not configured or is invalid
+
+The product images are too large and blocking video thumbnail generation
+
+The product catalog indexer needs to be rerun to generate thumbnails
+
+
+Explanation
+Question 10
+Customizations
+
+Correct
+What happens when you attempt to programmatically create a simple product without specifying the SKU attribute in Adobe Commerce?
+
+Answer Options
+The product will be created with an empty SKU field
+
+The product will be created but marked as inactive
+
+Your correct choice
+The product creation will fail with a validation error
+
+A default SKU will be automatically generated
+
+
+Explanation
+Question 11
+Architecture
+
+Correct
+A developer is creating custom system configuration and needs to understand the structure required for proper admin panel rendering.
+
+What are the three main structural elements that must be defined in etc/adminhtml/system.xml for configuration fields to render properly?
+
+Answer Options
+Your correct choice
+sections, groups, and fields
+
+modules, sections, and groups
+
+forms, fieldsets, and inputs
+
+tabs, sections, and fields
+
+
+Explanation
+Question 12
+Customizations
+
+Correct
+A developer needs to understand why customer attributes should be created through the EAV system rather than adding columns directly to the customer_entity table.
+
+What is the primary advantage of using the EAV system for customer attributes?
+
+Answer Options
+Direct table columns are faster for database queries than EAV structure
+
+Your correct choice
+EAV provides flexibility in customer attributes and proper admin panel integration
+
+EAV attributes automatically appear in all customer forms
+
+Customer_entity table cannot be modified using db_schema.xml
+
+
+Explanation
+Question 13
+Architecture
+
+Incorrect
+Which of the following indexers only supports "Update on Save" mode and is used for maintaining entity data in a flat structure for administrative grid displays?
+
+Answer Options
+Your incorrect choice
+catalog_category_product
+
+catalog_product_flat
+
+Correct answer
+customer_grid
+
+catalogsearch_fulltext
+
+
+Explanation
+Question 14
+Architecture
+
+Correct
+Which file would NOT be required for basic Adobe Commerce module registration and recognition, but is considered a best practice for dependency management?
+
+Answer Options
+Your correct choice
+composer.json
+
+etc/module.xml
+
+registration.php
+
+setup/InstallSchema.php
+
+
+Explanation
+Question 15
+Architecture
+
+Correct
+What is the difference between using the singular event.xml versus the plural events.xml for observer configuration?
+
+Answer Options
+Both files work identically, it's just a naming preference
+
+Your correct choice
+Adobe Commerce expects the plural events.xml, not event.xml, for observer declarations
+
+event.xml is for single observers, events.xml is for multiple observers
+
+event.xml is used in frontend scope, events.xml is used in adminhtml scope
+
+
+Explanation
+Question 16
+Customizations
+
+Correct
+What type of customer data is "Purchase Total" classified as in relation to customer segment conditions?
+
+Answer Options
+Standard profile field
+
+Your correct choice
+Aggregate value
+
+Direct customer attribute
+
+Sensitive customer data
+
+
+Explanation
+Question 17
+Customizations
+
+Correct
+An Adobe Commerce developer needs to configure a payment method for an international store where customers are required to transfer money electronically to the merchant's bank account before their orders are shipped.
+
+Which payment method should the developer implement for this pre-shipment electronic payment requirement?
+
+Answer Options
+Zero Subtotal Checkout
+
+Purchase Order
+
+Your correct choice
+Bank Transfer Payment
+
+Cash On Delivery
+
+
+Explanation
+Question 18
+Architecture
+
+Incorrect
+Which Adobe Commerce component specifically manages materialized views and database triggers that track changes in entities to support scheduled updates in indexers?
+
+Answer Options
+Your incorrect choice
+Magento\Framework\Index
+
+Magento_Indexer
+
+Correct answer
+Magento\Framework\Mview
+
+Magento\Framework\DB\Trigger
+
+
+Explanation
+Question 19
+Architecture
+
+Correct
+Which file is generated by the Magento installer during setup to store environment-specific sensitive data?
+
+Answer Options
+app/etc/config.xml
+
+Your correct choice
+app/etc/env.php
+
+app/etc/di.xml
+
+app/etc/config.php
+
+
+Explanation
+Question 20
+Architecture
+
+Incorrect
+What are the characteristics of Adobe Commerce cron job implementation? (Choose two.)
+
+Answer Options
+Your incorrect choice
+The bin/magento cron:run command executes jobs from all defined groups in a single run.
+
+Correct answer
+The bin/magento cron:install command adds Commerce cron jobs to the crontab within the #~ MAGENTO START and #~ MAGENTO END comments.
+
+Your correct choice
+The cron jobs can be defined in the crontab.xml file of a module in the <module_dir>/etc/ directory.
+
+Once installed, all Adobe Commerce cron jobs can only be modified through the Admin Panel interface.
+
+When using bin/magento cron:install --mode=update, existing cron jobs outside the MAGENTO comments will be preserved but merged with Commerce cron definitions.
+
+
+Explanation
+Question 21
+Architecture
+
+Correct
+What benefit does granular control over timing and execution provide when using multiple cron groups?
+
+Answer Options
+It automatically determines the best execution time for all scheduled tasks
+
+It consolidates execution timing to reduce server overhead
+
+Your correct choice
+It optimizes performance by ensuring important tasks are not delayed by unrelated jobs
+
+It ensures all cron jobs execute simultaneously for maximum efficiency
+
+
+Explanation
+Question 22
+Customizations
+
+Correct
+Which of the following is NOT a standard out-of-the-box Adobe Commerce pricing feature for product discounts?
+
+Answer Options
+Tier price
+
+Special price
+
+Group price
+
+Your correct choice
+Volume price
+
+
+Explanation
+Question 23
+Cloud
+
+Incorrect
+An Adobe Commerce developer needs to define the service dependencies for their Adobe Commerce Cloud project.
+
+Which configuration file should be used for this purpose?
+
+Answer Options
+composer.json
+
+Correct answer
+.magento/services.yaml
+
+Your incorrect choice
+.magento.env.yaml
+
+.magento.app.yaml
+
+
+Explanation
+Question 24
+Architecture
+
+Correct
+A developer needs to create a new admin grid using UI components. The developer has created a layout XML file at Company/Module/view/adminhtml/layout/company_entity_index.xml that references a UI component with the name "company_entity_listing".
+
+Where should the developer place the UI component definition file in the module's file structure?
+
+Answer Options
+Company/Module/view/adminhtml/ui_component/company_entity_index.xml
+
+Company/Module/Ui/Component/company_entity_listing.xml
+
+Your correct choice
+Company/Module/view/adminhtml/ui_component/company_entity_listing.xml
+
+Company/Module/etc/adminhtml/ui_component/company_entity_listing.xml
+
+
+Explanation
+Question 25
+Architecture
+
+Correct
+What is the primary benefit of using $.mage.__() over custom translation functions in Adobe Commerce JavaScript development?
+
+Answer Options
+Your correct choice
+Ensures compatibility with translation extraction and deployment processes
+
+Enables automatic string validation
+
+Provides better performance than custom functions
+
+Allows for more complex translation parameters
+
+
+Explanation
+Question 26
+Customizations
+
+Correct
+What happens when a category is configured as an "Anchor" category in terms of product display?
+
+Answer Options
+Your correct choice
+Combines products from the category and its child categories
+
+Displays only products directly assigned to the category
+
+Hides products from child categories to reduce clutter
+
+Displays products in a grid layout only
+
+
+Explanation
+Question 27
+Architecture
+
+Correct
+A system administrator needs to troubleshoot why a custom email configuration section is appearing at all scope levels when it should only be visible at the store view level for localized email templates.
+
+What is the most likely cause of this scoping issue?
+
+Answer Options
+Your correct choice
+Section attributes are set to showInDefault="1" showInWebsite="1" showInStore="1"
+
+Section attributes are set to showInDefault="0" showInWebsite="0" showInStore="1"
+
+Missing section attributes defaulting to showInDefault="0" showInWebsite="0" showInStore="0"
+
+Field attributes are correctly set but group attributes allow all scopes
+
+
+Explanation
+Question 28
+Architecture
+
+Correct
+Which file is responsible for bootstrapping the Adobe Commerce application and is required within the main entry point?
+
+Answer Options
+Your correct choice
+app/bootstrap.php
+
+app/etc/config.php
+
+pub/index.php
+
+index.php
+
+
+Explanation
+Question 29
+Architecture
+
+Correct
+Which command should be used to generate static view files in Adobe Commerce?
+
+Answer Options
+bin/magento setup:deploy:static-content
+
+bin/magento static:deploy:content
+
+Your correct choice
+bin/magento setup:static-content:deploy
+
+bin/magento setup-static:content:deploy
+
+
+Explanation
+Question 30
+Customizations
+
+Correct
+A developer needs to customize the display of shipping methods on the Adobe Commerce Checkout page. Which layout file should the developer modify to accomplish this?
+
+Answer Options
+checkout_cart_index.xml
+
+checkout_shipping_index.xml
+
+Your correct choice
+checkout_index_index.xml
+
+checkout_cart_shipping.xml
+
+
+Explanation
+Question 31
+Customizations
+
+Correct
+Which Adobe Commerce configuration file is excluded from version control by default and contains sensitive environment-specific information?
+
+Answer Options
+app/etc/config.xml
+
+app/etc/di.xml
+
+app/etc/config.php
+
+Your correct choice
+app/etc/env.php
+
+
+Explanation
+Question 32
+Architecture
+
+Correct
+In Adobe Commerce, where should custom themes be placed to ensure proper recognition by the system?
+
+Answer Options
+pub/static/frontend/<Vendor>/<theme>
+
+app/themes/frontend/<Vendor>/<theme>
+
+Your correct choice
+app/design/frontend/<Vendor>/<theme>
+
+app/code/frontend/<Vendor>/<theme>
+
+
+Explanation
+Question 33
+Cloud
+
+Correct
+What makes magento-cloud environment:snapshot an incomplete command in Adobe Commerce Cloud?
+
+Answer Options
+It uses the wrong namespace prefix and should start with magento-cloud snapshot
+
+It is missing the --force flag required for environment operations
+
+Your correct choice
+It lacks the required action verb like create to specify what operation to perform
+
+It requires additional parameters like --environment-id to function properly
+
+
+Explanation
+Question 34
+Cloud
+
+Incorrect
+For dynamic asset generation and media uploads in Adobe Commerce Cloud Production environment, which directories must remain writable during runtime operations?
+
+Answer Options
+Correct answer
+pub/static, pub/media
+
+var, generated
+
+Your incorrect choice
+app/code, pub/static
+
+app/etc, app/code
+
+
+Explanation
+Question 35
+Architecture
+
+Incorrect
+A developer needs to understand how Adobe Commerce's dependency injection system handles disabled plugins during the application loading process.
+
+What happens when a plugin is configured with disabled="true" in di.xml?
+
+Answer Options
+Correct answer
+The DI system skips execution of the plugin entirely
+
+Your incorrect choice
+The plugin is loaded but marked as inactive for later activation
+
+The plugin throws an exception during dependency injection
+
+The plugin is loaded normally but returns null for all intercepted methods
+
+
+Explanation
+Question 36
+Customizations
+
+Incorrect
+A developer is reviewing db_schema.xml syntax and notices that data types are specified using attributes rather than nested XML elements.
+
+What is the correct way to specify data type attributes in db_schema.xml column definitions?
+
+Answer Options
+Your incorrect choice
+Use both xsi:type and nested elements for compatibility
+
+Use the datatype attribute instead of xsi:type
+
+Use nested elements within the column definition
+
+Correct answer
+Use xsi:type attribute to specify the data type
+
+
+Explanation
+Question 37
+Architecture
+
+Correct
+In the Adobe Commerce multi-store hierarchy, what is the topmost level in the organizational structure?
+
+Answer Options
+Your correct choice
+Website
+
+Store
+
+Store View
+
+Store Front
+
+
+Explanation
+Question 38
+Customizations
+
+Incorrect
+Which product recommendation type is typically displayed on the product detail page to show similar or complementary items to customers?
+
+Answer Options
+No answer provided
+Cross-sell products
+
+Correct answer
+Related products
+
+Up-sell products
+
+Recently viewed products
+
+
+Explanation
+Question 39
+Architecture
+
+Correct
+Which scope level in Adobe Commerce's multi-store hierarchy encompasses all other scopes?
+
+Answer Options
+Store View
+
+Website
+
+Your correct choice
+Global
+
+Store
+
+
+Explanation
+Question 40
+Architecture
+
+Correct
+A developer needs to create a plugin that only executes for the frontend area of an Adobe Commerce store.
+
+Which directory should the di.xml file be placed in?
+
+Answer Options
+<module>/etc/base
+
+Your correct choice
+<module>/etc/frontend
+
+<module>/etc/store
+
+<module>/etc/global
+
+
+Explanation
+Question 41
+Customizations
+
+Correct
+Which product type displays multiple related products together where customers add quantities of individual items without attribute-based option selections?
+
+Answer Options
+Your correct choice
+Grouped
+
+Virtual
+
+Configurable
+
+Bundle
+
+
+Explanation
+Question 42
+Architecture
+
+Correct
+What is the primary advantage of Composer managing module installation in the vendor directory compared to manual installation?
+
+Answer Options
+Faster module execution performance
+
+Better integration with Adobe Commerce core
+
+Your correct choice
+Standardized autoloading and automated updates
+
+Reduced server disk space usage
+
+
+Explanation
+Question 43
+Customizations
+
+Correct
+What determines whether a product attribute can be used as a condition in cart price rules?
+
+Answer Options
+Attribute must have a frontend input type of text
+
+Attribute must be visible on frontend
+
+Attribute must be marked as required
+
+Your correct choice
+"Use for Promo Rule Conditions" must be enabled
+
+
+Explanation
+Question 44
+Cloud
+
+Incorrect
+Which database solution provides high availability clustering in Adobe Commerce Cloud Pro?
+
+Answer Options
+Redis Cluster
+
+Your incorrect choice
+GlusterFS Cluster
+
+Correct answer
+Galera (MySQL Galera Cluster)
+
+Elasticsearch Cluster
+
+
+Explanation
+Question 45
+Architecture
+
+Incorrect
+Which URL format demonstrates a successful URL rewrite in Adobe Commerce?
+
+Answer Options
+Correct answer
+http://www.example.com/magento/storeview/custom-slug
+
+http://www.example.com/magento/index.php?id=123&custom-slug=default
+
+Your incorrect choice
+http://www.example.com/magento/index/custom-slug
+
+http://www.example.com/magento/index.php/storeview/custom-slug
+
+
+Explanation
+Question 46
+Architecture
+
+Correct
+A developer needs to understand the difference between plugin configuration and event observer configuration in Adobe Commerce. Which statement correctly describes the key distinction between these two mechanisms?
+
+Answer Options
+Your correct choice
+Plugins use di.xml for configuration while event observers use events.xml for configuration
+
+Plugins and event observers both use events.xml but with different parameter names
+
+Plugins are for method interception while event observers respond to system events
+
+Plugins and event observers both use sortOrder parameter for execution control
+
+
+Explanation
+Question 47
+Customizations
+
+Correct
+Which data types can extension attributes handle that regular entity attributes cannot?
+
+Answer Options
+File upload types only
+
+Your correct choice
+Arrays and objects
+
+String and integer values
+
+Boolean and date values
+
+
+Explanation
+Question 48
+Customizations
+
+Correct
+A store administrator is troubleshooting URL-related issues in their Adobe Commerce store. They notice that when they modify the "Product URL Suffix" setting, it only changes the file extension but doesn't resolve the underlying problem of products being accessible through multiple category-based URLs.
+
+What is the relationship between the "Product URL Suffix" setting and category path inclusion in product URLs?
+
+Answer Options
+Product URL Suffix automatically includes category information when set to .html
+
+Product URL Suffix and category path inclusion are controlled by the same configuration setting
+
+Product URL Suffix must be empty to disable category paths in product URLs
+
+Your correct choice
+Product URL Suffix only changes the file extension and has no impact on whether category paths are included in URLs
+
+
+Explanation
+Question 49
+Customizations
+
+Correct
+Which product type in Adobe Commerce provides customers with selectable options for a single product, such as choosing different sizes or colors, rather than assembling packages of multiple products?
+
+Answer Options
+Bundle product
+
+Grouped product
+
+Your correct choice
+Configurable product
+
+Virtual product
+
+
+Explanation
+Question 50
+Cloud
+
+Incorrect
+Which Adobe Commerce Cloud architecture tier provides unlimited Integration environments for parallel development workflows?
+
+Answer Options
+Starter Architecture
+
+Developer Architecture
+
+Correct answer
+Pro Architecture
+
+Your incorrect choice
+Enterprise Architecture
+
+
+Explanation

@@ -1,0 +1,289 @@
+Minimum experience
+
+You should be comfortable working in Adobe Commerce and have a basic understanding of Adobe Commerce admin development, architecture, EAV/database, layout/UI, checkout and sales, and catalog.
+
+Additionally, you should be familiar with the following technologies and environments:
+
+Adobe Commerce - version 2.4
+Good understanding of PHP
+Knowledge of MYSQL
+Knowledge of Object-Oriented Programming
+Knowledge of Cloud Architecture
+
+
+Exam objectives and scope
+
+This exam covers these objectives, each making up a certain percentage of the exam.
+
+
+Section 1: Architecture (52%)
+Describe module file structure
+
+Describe Adobe Commerce CLI commands
+
+Describe CRON functionality
+
+Describe index functionality
+
+Describe localization
+
+Explain components (plugin, preference, observers etc.)
+
+Describe URL rewrites
+
+Describe the Magento caching system
+
+Describe stores, websites, and store views
+
+Recall the code architecture of admin panel
+
+Describe attributes and attribute sets
+
+
+Section 2: Customizations (36%)
+Demonstrate knowledge of how to operate the catalog
+
+Explain check out and sales operations
+
+Manipulate entity types programmatically
+
+Identify the data flow in and out of Adobe SaaS services
+
+Identify API features
+
+
+Section 3: Cloud (12%)
+Describe Adobe Commerce Cloud architecture
+
+Describe the setup and configuration of Adobe Commerce Cloud
+
+Recall the Adobe Commerce Cloud CLI tool
+
+
+Section 1: Architecture (52%)
+Lesson 3 of 9
+The Architecture section of the exam will test your ability to:
+
+Describe module file structure
+
+Describe Adobe Commerce CLI commands
+
+Describe CRON functionality
+
+Describe index functionality
+
+Describe localization
+
+Explain components (plugin, preference, observers etc.)
+
+Describe URL rewrites
+
+Describe the Magento caching system
+
+Describe stores, websites, and store views
+
+Recall the code architecture of admin panel
+
+Describe attributes and attribute sets
+
+Build
+
+Required configuration files
+
+Each module has its own set of configuration files, gathered into the module's etc directory.
+
+Learn more about required configuration files(opens in a new tab).
+
+Dependency injection configuration
+
+The di.xml file configures which dependencies are injected by the object manager. You can also specify sensitive configuration settings using di.xml.
+
+PFV leia a https://developer.adobe.com/commerce/php/development/build/dependency-injection-file para termos mais detalhes.
+
+Component development
+
+EAV and extension attributes
+
+There are two types of attributes you can use to extend Adobe Commerce and Magento Open Source functionality:
+
+Custom and Entity-Attribute-Value (EAV) attributes
+
+Extension attributes
+
+PFV leia a https://developer.adobe.com/commerce/php/development/components/attributes para termos mais detalhes.
+
+
+Plugins
+
+A plugin, or interceptor, is a class that modifies the behavior of public class functions by intercepting a function call and running code before, after, or around that function call. This allows you to substitute or extend the behavior of original, public methods for any class or interface.
+
+Learn more about plugins(opens in a new tab).
+
+Events and observers
+
+Working with events and observers is one of the main ways to extend Adobe Commerce and Magento Open Source functionality. The events and observers implementation in Adobe Commerce and Magento Open Source are based on the publish-subscribe pattern. Using events and observers, you can run your custom code in response to a specific event or even a custom event.
+
+Learn more about events and observers(opens in a new tab).
+
+Extension coding
+
+Observers best practices
+
+Observers are capable of modifying the behavior of the Adobe Commerce and Magento Open Source applications because they are dynamically injected into the execution flow. Poorly designed and coded observers can cause issues, instabilities, or otherwise break the application.
+
+Learn more about Observers best practices(opens in a new tab).
+
+Search engine optimization
+
+URL rewrites
+
+The URL rewrite tool lets you change any URL that is associated with a product, category, or CMS page. When the rewrite goes into effect, any links that point to the previous URL are redirected to the new address.
+
+Learn more about URL rewrites(opens in a new tab).
+
+System tools and settings
+
+Cache management
+
+The Adobe Commerce and Magento Open Source cache management system provides an easy way to improve the performance of your site. Whenever a cache requires a refresh, a notification displays with a link to the Cache Management page to complete the refresh.
+
+Learn more about cache management(opens in a new tab).
+
+Configuration
+
+Crons property
+
+Adobe Commerce uses the crons property to schedule repetitive activities. It is ideal for scheduling a specific task to run at certain times of the day. Only one cron job can run at a time on the web instance for Adobe Commerce on cloud infrastructure projects because of the nature of read-only environments. It is a best practice to break down long-running tasks into smaller, queued tasks. Alternatively, you can build a worker instance.
+
+Learn more about the Crons property(opens in a new tab).
+
+Admin development
+
+Creating an Admin page
+
+You should review the tutorial that gives instructions for the creation of a module that displays a simple page in the Admin.
+
+Learn more about creating an Admin page(opens in a new tab).
+
+Product attributes
+
+Attribute sets
+
+One of the first steps when creating a product is to choose the attribute set that is used as a template for the product record. The attribute set determines the fields that are available during data entry, and the values that appear to the customer.
+
+Learn more about Attribute sets(opens in a new tab).
+
+Creating and deleting product attributes
+
+You can create attributes while working on a product or from the Product Attributes page. You should review the steps that show how to create attributes from the Stores menu.
+
+Learn more about creating and deleting product attributes(opens in a new tab).
+
+Site and store management
+
+Store localization
+
+Most of the text that appears to be hard-coded on pages throughout your store can be instantly changed to a different language by changing the locale of the view. Changing the locale does not actually translate the text word-for-word, but simply references a different translation table that provides the interface text that is used throughout the store. The text that can be changed includes navigational titles, labels, buttons, and links such as My Cart and My Account. You can also use the Inline Translation tool to touch up text in the interface.
+
+Learn more about store localization(opens in a new tab).
+
+Basic setup and configuration
+
+Site, store, and view scope
+
+Every Adobe Commerce and Magento Open Source installation has a hierarchy of websites, stores, and store views. The term scope determines where in the hierarchy a database entity — such as a product, attribute, or category — content element, or configuration setting applies. Websites, stores, and store views have one-to-many parent/child relationships. A single installation can have multiple websites, and each website can have multiple stores and store views.
+
+Learn more about site, store, and view scope(opens in a new tab).
+
+Customer accounts
+
+Customer account scope
+
+The header of every page in your store extends an invitation for shoppers to Log in or register for an account with your store.
+
+Learn more about customer account scope(opens in a new tab).
+
+Command line
+
+Performance testing data
+
+You can adjust the amount of data you create using profiles (small, medium, large, and extra large). Profiles are located in the <magento_root>/setup/performance-toolkit/profiles/<ce|ee> directory.
+
+Learn more about performance testing data(opens in a new tab).
+
+Deploying static view files
+
+The static view files deployment command enables you to write static files to the Commerce file system when the Commerce software is set for production mode.
+
+Learn more about deploying static view files(opens in a new tab).
+
+Configuring cron jobs
+
+Several Commerce features require at least one cron job, which schedules activities to occur in the future. A partial list of these activities follows:
+
+Catalog price rules
+
+Newsletters
+
+Generating Google sitemaps
+
+Customer Alerts/Notifications (product price change, product back in stock)
+
+Reindexing
+
+Learn more about configuring cron jobs(opens in a new tab).
+
+Managing the indexers
+
+You should review the indexer commands.
+
+Learn more about managing the indexers(opens in a new tab).
+
+Managing the cache
+
+You should understand how System administrators or developers with access to the Commerce application server can manage caches from the command line.
+
+Learn more about managing the cache(opens in a new tab).
+
+Partial caching
+
+Creating a cache type
+
+A cache type enables you to specify what is cached and enables merchants to clear that cache type using the Cache Management page in the Admin.
+
+Learn more about creating a cache type(opens in a new tab).
+
+General
+
+Advanced setup
+
+Commerce is a highly flexible and scalable product containing solutions for merchants of all sizes. You should review the best practices and recommendations on configuring Commerce to work with large amounts of data, extreme load, and other enterprise cases.
+
+Learn more about advanced setup(opens in a new tab).
+
+Extension developer roadmap
+
+You should review the high-level workflow for a developer who wants to create or customize the Adobe Commerce or Magento Open Source application.
+
+Review the Extension developer roadmap(opens in a new tab).
+
+PFV leia as urls:
+https://experienceleague.adobe.com/en/docs/commerce-admin/marketing/seo/url-rewrites/url-rewrite
+https://experienceleague.adobe.com/en/docs/commerce-admin/systems/tools/cache-management
+https://experienceleague.adobe.com/en/docs/commerce-on-cloud/user-guide/configure/app/properties/crons-property
+https://developer.adobe.com/commerce/php/tutorials/admin/create-admin-page
+https://experienceleague.adobe.com/en/docs/commerce-admin/catalog/product-attributes/create/attribute-sets
+https://experienceleague.adobe.com/en/docs/commerce-admin/catalog/product-attributes/create/attribute-product-create
+https://experienceleague.adobe.com/en/docs/commerce-admin/stores-sales/site-store/store-localize
+https://experienceleague.adobe.com/en/docs/commerce-admin/start/setup/websites-stores-views
+https://experienceleague.adobe.com/en/docs/commerce-admin/customers/customer-accounts/customer-account-scope
+https://experienceleague.adobe.com/en/docs/commerce-operations/configuration-guide/cli/generate-data
+https://experienceleague.adobe.com/en/docs/commerce-operations/configuration-guide/cli/static-view/static-view-file-deployment
+https://experienceleague.adobe.com/en/docs/commerce-operations/configuration-guide/cli/configure-cron-jobs
+https://experienceleague.adobe.com/en/docs/commerce-operations/configuration-guide/cli/manage-indexers
+https://experienceleague.adobe.com/en/docs/commerce-operations/configuration-guide/cli/manage-cache
+https://developer.adobe.com/commerce/php/development/cache/partial/cache-type
+https://experienceleague.adobe.com/en/docs/commerce-operations/performance-best-practices/performance-best-practices/advanced-setup
+https://developer.adobe.com/commerce/php/development/components/plugins
+https://developer.adobe.com/commerce/php/development/components/events-and-observers/
+https://developer.adobe.com/commerce/php/best-practices/extensions/observers
