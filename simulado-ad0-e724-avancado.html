@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado AD0-E724 - Avancado</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#10131a;--panel:#171b24;--panel2:#202633;--panel3:#293142;
+  --text:#eef2ff;--muted:#aab3c7;--line:#394255;--accent:#f0abfc;
+  --accent2:#60a5fa;--warn:#fbbf24;--bad:#fb7185;--good:#34d399;
+  --shadow:0 18px 60px rgba(0,0,0,.35);--radius:8px;
+}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.45}
+button,input,select{font:inherit}
+.app{min-height:100vh;display:grid;grid-template-columns:300px minmax(0,1fr)}
+.side{background:var(--panel);border-right:1px solid var(--line);padding:20px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{font-size:13px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.title{font-size:24px;font-weight:800;margin:8px 0 4px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:22px}
+.stat{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.stat span:first-child{color:var(--muted)}
+.pill{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted);font-size:12px;background:rgba(255,255,255,.02)}
+.pill.hard{border-color:var(--accent);color:var(--accent)}
+.domain-bars{display:grid;gap:10px;margin:16px 0}
+.bar-label{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:5px}
+.bar{height:8px;background:var(--panel3);border-radius:999px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent2);width:0%}
+.navgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:14px}
+.navbtn{height:36px;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:6px;cursor:pointer}
+.navbtn.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.navbtn.answered{background:#14362d;border-color:#256d56}
+.navbtn.review{background:#3b2f12;border-color:#7a5b13}
+.main{padding:28px;max-width:1080px;width:100%;margin:0 auto}
+.screen{display:none}
+.screen.active{display:block}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.setup{padding:28px;display:grid;gap:22px}
+.setup-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.choice-card{border:1px solid var(--line);background:var(--panel2);border-radius:var(--radius);padding:16px;cursor:pointer}
+.choice-card input{margin-right:8px}
+.choice-card strong{display:block;margin-bottom:6px}
+.choice-card small{color:var(--muted)}
+.field{display:grid;gap:7px}
+.field label{color:var(--muted);font-size:13px}
+select{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:10px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:6px;padding:10px 14px;cursor:pointer}
+.btn:hover{border-color:var(--accent2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#2a0a2e;font-weight:800}
+.btn.danger{border-color:#7f1d1d;color:#fecaca;background:#341319}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px}
+.timer{font-variant-numeric:tabular-nums;font-weight:800;color:var(--accent)}
+.question{padding:26px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.qtext{font-size:22px;font-weight:750;margin-bottom:18px}
+.hint{color:var(--muted);font-size:14px;margin:-8px 0 16px}
+.options{display:grid;gap:10px}
+.option{width:100%;text-align:left;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:8px;padding:14px 16px;cursor:pointer;display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start}
+.option:hover{border-color:var(--accent2);background:var(--panel3)}
+.option .letter{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:var(--panel3);font-weight:800;color:var(--muted)}
+.option.selected{border-color:var(--accent);background:#3a1a3d}
+.option.correct{border-color:var(--good);background:#12362c}
+.option.wrong{border-color:var(--bad);background:#3b151d}
+.feedback{display:none;margin-top:18px;padding:16px;border-radius:8px;background:var(--panel2);border:1px solid var(--line)}
+.feedback.show{display:block}
+.feedback.good{border-color:var(--good)}
+.feedback.bad{border-color:var(--bad)}
+.bottom{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+.results{padding:26px}
+.score{font-size:44px;font-weight:900;margin:8px 0}
+.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
+.result-card{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:14px}
+.review-list{display:grid;gap:10px;margin-top:16px}
+.review-item{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:14px}
+.review-item strong{display:block;margin-bottom:6px}
+.muted{color:var(--muted)}
+@media(max-width:860px){
+  .app{display:block}.side{position:relative;height:auto}.main{padding:16px}
+  .setup-grid,.result-grid{grid-template-columns:1fr}.qtext{font-size:19px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">Adobe Commerce</div>
+    <div class="title">AD0-E724 <span style="color:var(--accent)">Avancado</span></div>
+    <div class="sub">Versao mais dificil do simulado: cenarios reais, sem "chutes obvios" e alternativas parecidas entre si.</div>
+    <div class="stat"><span>Meta oficial</span><strong>39/50</strong></div>
+    <div class="stat"><span>Aprovacao</span><strong>78%</strong></div>
+    <div class="stat"><span>Tempo prova</span><strong>100 min</strong></div>
+    <div class="pill hard">nivel: distratores proximos da resposta certa</div>
+    <div class="domain-bars">
+      <div><div class="bar-label"><span>Arquitetura</span><span id="archPct">52%</span></div><div class="bar"><i style="width:52%"></i></div></div>
+      <div><div class="bar-label"><span>Customizacoes</span><span id="custPct">36%</span></div><div class="bar"><i style="width:36%"></i></div></div>
+      <div><div class="bar-label"><span>Cloud</span><span id="cloudPct">12%</span></div><div class="bar"><i style="width:12%"></i></div></div>
+    </div>
+    <div id="progressBox" style="display:none">
+      <div class="stat"><span>Respondidas</span><strong id="answeredCount">0/50</strong></div>
+      <div class="stat"><span>Marcadas</span><strong id="reviewCount">0</strong></div>
+      <div class="navgrid" id="navgrid"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="screen active" id="setupScreen">
+      <div class="panel setup">
+        <div>
+          <span class="pill hard">edicao dificil - cenarios de prova real</span>
+          <h1>Escolhe como quer treinar agora</h1>
+          <p class="muted">Todas as perguntas aqui sao baseadas em pegadinhas reais do exame: nomes de arquivo quase certos, comandos incompletos, e alternativas que soam plausiveis mas estao erradas. Nao espere respostas obvias.</p>
+        </div>
+        <div class="setup-grid">
+          <label class="choice-card">
+            <input type="radio" name="mode" value="exam" checked>
+            <strong>Prova real</strong>
+            <small>50 questoes, 100 minutos, peso 26/18/6 por dominio.</small>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="mode" value="practice">
+            <strong>Treino em tempo real</strong>
+            <small>Feedback imediato depois de confirmar cada pergunta.</small>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="mode" value="cloud">
+            <strong>Reforco Cloud</strong>
+            <small>Foco nos comandos e arquivos que mais confundem no Cloud.</small>
+          </label>
+        </div>
+        <div class="setup-grid">
+          <div class="field">
+            <label for="countSelect">Quantidade</label>
+            <select id="countSelect">
+              <option value="10">10 perguntas</option>
+              <option value="20">20 perguntas</option>
+              <option value="30">30 perguntas</option>
+              <option value="50" selected>50 perguntas</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="domainSelect">Dominio no treino</label>
+            <select id="domainSelect">
+              <option value="all">Todos</option>
+              <option value="Architecture">Arquitetura</option>
+              <option value="Customizations">Customizacoes</option>
+              <option value="Cloud">Cloud</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="timerSelect">Timer</label>
+            <select id="timerSelect">
+              <option value="real" selected>Proporcional a prova</option>
+              <option value="off">Sem timer</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="startBtn">Comecar simulado dificil</button>
+          <button class="btn" id="historyBtn">Ver ultimo resultado</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="quizScreen">
+      <div class="topline">
+        <div><span class="pill" id="modeLabel">Prova real</span></div>
+        <div class="timer" id="timer">100:00</div>
+      </div>
+      <div class="panel question">
+        <div class="meta">
+          <span class="pill" id="qNumber">1/50</span>
+          <span class="pill" id="qDomain">Arquitetura</span>
+          <span class="pill" id="qTopic">DI</span>
+        </div>
+        <div class="qtext" id="qText"></div>
+        <div class="hint" id="qHint"></div>
+        <div class="options" id="options"></div>
+        <div class="feedback" id="feedback"></div>
+        <div class="bottom">
+          <div class="actions">
+            <button class="btn" id="prevBtn">Anterior</button>
+            <button class="btn" id="reviewBtn">Marcar revisao</button>
+          </div>
+          <div class="actions">
+            <button class="btn" id="checkBtn">Confirmar</button>
+            <button class="btn" id="nextBtn">Proxima</button>
+            <button class="btn danger" id="finishBtn">Finalizar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="resultScreen">
+      <div class="panel results">
+        <span class="pill">resultado</span>
+        <div class="score" id="scoreText">0%</div>
+        <p id="passText"></p>
+        <div class="result-grid" id="domainResults"></div>
+        <div class="actions">
+          <button class="btn primary" id="restartBtn">Novo simulado</button>
+          <button class="btn" id="reviewWrongBtn">Revisar erros</button>
+        </div>
+        <div class="review-list" id="reviewList"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const BANK=[
+{d:'Architecture',t:'DI / Seguranca',q:'Um desenvolvedor quer guardar a chave de API de um servico de pagamento de forma segura, fora do controle de versao. Qual arquivo e o local correto?',o:['etc/di.xml do modulo','app/etc/env.php','app/etc/config.php','etc/config.xml do modulo'],a:[1],e:'env.php guarda credenciais sensiveis e fica fora do git; di.xml e config.xml/config.php nao lidam com segredos.'},
+{d:'Architecture',t:'EAV',q:'Ao criar um atributo de cliente via CustomerSetup::addAttribute, qual chave controla se o campo aparece nas paginas de conta do cliente no storefront (e nao no admin)?',o:['visible','visible_on_front','user_defined','show_on_front'],a:[1],e:'visible controla o admin; visible_on_front controla o frontend. show_on_front nao existe como chave.'},
+{d:'Architecture',t:'Plugins',q:'Um di.xml declara: <plugin name="my_plugin" type="Vendor_Module_Plugin_MyPlugin" sortOrder="10" active="false"/>. Por que esse plugin provavelmente continua ativo mesmo depois do deploy?',o:['sortOrder precisa ser maior que 10','active nao e um atributo valido de <plugin>; o correto e disabled','type deveria apontar para uma interface, nao uma classe','falta declarar <arguments> mesmo sem parametros'],a:[1],e:'O atributo correto para desativar um plugin e disabled="true"; active nao existe em <plugin> e e ignorado.'},
+{d:'Architecture',t:'Modulos',q:'Um modulo tem <sequence><before name="Magento_Catalog"/></sequence> dentro de module.xml. Qual o efeito real disso no boot do Magento?',o:['Magento lanca erro fatal de schema invalido','A tag e ignorada silenciosamente; a ordem de carregamento nao muda como o autor esperava','Magento_Catalog passa a carregar depois do modulo customizado','O modulo e automaticamente desabilitado'],a:[1],e:'<before> nao existe dentro de <sequence>; o schema so aceita <module name="...">, entao a tag e ignorada sem erro visivel.'},
+{d:'Architecture',t:'Events',q:'Um observer declarado em etc/event.xml nao esta sendo disparado em nenhuma area. Qual e a causa mais provavel?',o:['O observer precisa de sortOrder','O nome do arquivo deveria ser events.xml, no plural','Observers so funcionam quando declarados em etc/frontend/','O evento tambem precisa ser registrado em di.xml'],a:[1],e:'O arquivo correto e events.xml, no plural; event.xml singular nao e reconhecido pelo Magento.'},
+{d:'Architecture',t:'Admin/Config',q:'Um campo criado em etc/adminhtml/system.xml aparece no admin, mas sempre vazio, mesmo logo apos a instalacao do modulo. O que provavelmente falta?',o:['Um valor default em etc/config.xml','showInDefault="1" no <field>','Um data patch que preencha o campo','Uma entrada em acl.xml liberando o campo'],a:[0],e:'system.xml define apenas estrutura (labels, tipos, grupos); valores padrao vem de etc/config.xml.'},
+{d:'Architecture',t:'Frontend/i18n',q:'Em um arquivo JavaScript (fora do PHP), qual chamada de traducao e realmente suportada nativamente pelo Magento?',o:['$.mage.__("Text")','$translate("Text")','Magento.translate("Text")','window.translate("Text")'],a:[0],e:'$.mage.__ e a unica funcao de traducao JS oficial documentada; as demais nao existem no core e nao integram com i18n:collect-phrases.'},
+{d:'Architecture',t:'Cron',q:'Depois de rodar bin/magento cron:install em um servidor que ja tinha outros crons configurados manualmente fora do Magento, o que acontece com esses crons externos?',o:['Sao removidos porque o crontab e reescrito do zero','Permanecem intactos; o Magento so insere/atualiza o conteudo entre os marcadores MAGENTO START/END','Sao movidos para dentro dos marcadores MAGENTO','Passam a rodar como jobs do grupo default do Magento'],a:[1],e:'cron:install so gerencia o conteudo entre os marcadores MAGENTO START/END, preservando o restante do crontab do servidor.'},
+{d:'Architecture',t:'DI Scope',q:'Um plugin com name="foo" e declarado em etc/di.xml (global) e outro plugin, tambem com name="foo", e declarado em etc/adminhtml/di.xml para o mesmo tipo. O que acontece em uma requisicao do admin?',o:['Os dois plugins rodam em sequencia, um depois do outro','O global sempre vence, pois carrega primeiro no boot','A configuracao de etc/adminhtml/di.xml sobrescreve a global para aquele elemento nessa area','Magento lanca erro de plugin duplicado e aborta a requisicao'],a:[2],e:'Configuracao de area especifica (adminhtml, frontend) sempre sobrescreve a configuracao global para o mesmo elemento/name.'},
+{d:'Architecture',t:'Indexers',q:'Um cliente quer configurar o indexer customer_grid para rodar em "Update by Schedule" via cron, igual ao catalog_product_price. Isso e possivel apenas adicionando um mview.xml?',o:['Sim, basta adicionar mview.xml e o modo passa a funcionar','Sim, e o comportamento padrao desse indexer','Nao, customer_grid so suporta o modo Update on Save, independente de mview.xml','Nao, precisa antes desabilitar catalogsearch_fulltext'],a:[2],e:'customer_grid e um dos indexers do core que so suporta Update on Save; nao ha suporte a Update by Schedule mesmo com mview configurado.'},
+{d:'Architecture',t:'Indexers/Mview',q:'Um indexer customizado esta declarado em indexer.xml, mas o modo "Update by Schedule" nao reflete as mudancas automaticamente, so via indexer:reindex manual. O que provavelmente falta?',o:['Um cron job extra em crontab.xml apontando direto para o indexer','Um arquivo mview.xml com os triggers de rastreamento das tabelas relevantes','Um data patch que popule a tabela de index na instalacao','Uma entrada em cache.xml para o novo indexer'],a:[1],e:'mview.xml declara as materialized views/triggers que alimentam o Update by Schedule; sem ele, o indexer so atualiza via reindex manual ou Update on Save.'},
+{d:'Architecture',t:'Layout',q:'Um arquivo view/adminhtml/layout/checkout_index_index.xml existe em um modulo customizado. Em qual area esse layout sera aplicado?',o:['Frontend, porque o nome do handle e tipicamente de frontend','Adminhtml, porque a area e determinada pelo diretorio onde o arquivo esta, nao pelo nome do handle','Nas duas areas simultaneamente','Em nenhuma area, pois checkout nao existe no admin'],a:[1],e:'A area e definida pelo diretorio (frontend/ vs adminhtml/); o nome do arquivo so identifica o handle, mesmo coincidindo com um handle tipico de outra area.'},
+{d:'Architecture',t:'UI Components',q:'Um layout referencia <uiComponent name="product_export_grid"/>, mas a grid nao aparece na tela. O arquivo XML do componente se chama productExportGrid.xml. Qual e o problema?',o:['UI Components nao suportam grids totalmente customizadas','O nome do arquivo deve ser exatamente igual ao name referenciado: product_export_grid.xml','Falta declarar o componente tambem em di.xml','O atributo correto no layout seria id, nao name'],a:[1],e:'O nome do arquivo do UI component precisa corresponder exatamente ao name usado no layout; nome divergente faz o componente nao ser encontrado, sem erro imediato.'},
+{d:'Architecture',t:'EAV',q:'Um desenvolvedor precisa adicionar um campo do tipo array de objetos ao retorno da API de Order, sem criar um atributo EAV para isso. Qual mecanismo suporta esse tipo de dado?',o:['Um atributo EAV com input type multiselect','Extension Attributes, que suportam arrays e objetos, ao contrario do EAV, limitado a tipos primitivos','Uma nova coluna em sales_order via db_schema.xml, sem contrato de API','Um campo customizado direto no Data Model, sem interface publicada'],a:[1],e:'EAV so suporta tipos primitivos (string, int, decimal, datetime); extension attributes suportam arrays/objetos e sao o mecanismo certo para estender contratos de API.'},
+{d:'Architecture',t:'Admin/Config',q:'Um <field> tem showInWebsite="1", mas o <group> pai tem showInWebsite="0". O que acontece na pratica com esse campo no escopo Website?',o:['O campo aparece normalmente no escopo Website, pois o field tem prioridade','O campo nao aparece no escopo Website, porque um filho nao pode ser menos restritivo que o pai','O XSD rejeita o arquivo e o modulo quebra','O campo passa a aparecer em todos os escopos por seguranca'],a:[1],e:'Um filho nao pode ser mais permissivo que o pai; se o group bloqueia o escopo, o field fica bloqueado nesse escopo mesmo declarando showInWebsite="1".'},
+{d:'Architecture',t:'Modulos',q:'Um modulo instalado via composer aparece em vendor/acme/module-foo. E preciso customizar uma classe desse modulo sem editar o codigo do vendor diretamente. Qual abordagem e recomendada?',o:['Editar os arquivos direto em vendor/, ja que o composer permite escrita','Copiar o modulo inteiro para app/code e desabilitar o do vendor','Criar um modulo em app/code que aplica Plugin ou Preference sobre as classes do modulo em vendor','Renomear a pasta em vendor/ para o composer nao sobrescrever'],a:[2],e:'Nunca se edita vendor/ diretamente, pois sera sobrescrito em atualizacoes; a customizacao correta e via Plugin/Preference em um modulo proprio.'},
+{d:'Architecture',t:'Routing',q:'Um QA reporta que https://loja.com/admin/index.php retorna 404 e conclui que o entry point do admin quebrou. Essa conclusao esta correta?',o:['Sim, admin/index.php deveria existir e foi removido por engano','Nao, o Magento nao possui admin/index.php; tudo passa por pub/index.php com roteamento baseado no Admin URI configurado','Sim, mas apenas em instalacoes hospedadas no Cloud','Nao, o correto seria acessar admin.php na raiz do projeto'],a:[1],e:'Nao existe entry point separado para o admin; a requisicao passa por pub/index.php e o caminho do admin depende do Admin URI (frontName) configurado.'},
+{d:'Architecture',t:'Cache',q:'Em producao, com Redis compartilhado entre varios processos, qual comando e mais seguro para invalidar cache apos alterar uma configuracao pontual, sem impactar outros processos que usam o mesmo Redis?',o:['bin/magento cache:flush','bin/magento cache:clean','Apagar manualmente as chaves no Redis via redis-cli','bin/magento setup:upgrade'],a:[1],e:'cache:clean invalida por tag, mantendo o storage; cache:flush apaga todo o storage do backend configurado, podendo afetar outros processos.'},
+{d:'Architecture',t:'Plugins',q:'O metodo original e public function execute(int $orderId, string $comment): bool. Qual assinatura de aroundExecute preserva corretamente o comportamento original ao chamar $proceed?',o:['function aroundExecute($subject, callable $proceed) { return $proceed(); }','function aroundExecute($subject, callable $proceed, int $orderId, string $comment) { return $proceed($orderId, $comment); }','function aroundExecute($subject, int $orderId, string $comment) { return true; }','function aroundExecute($subject, callable $proceed, array $args) { return $proceed($args); }'],a:[1],e:'O around plugin recebe subject, proceed e depois os argumentos originais na mesma ordem; eles devem ser declarados e repassados explicitamente para $proceed.'},
+{d:'Architecture',t:'Plugins',q:'Um around plugin em aroundSave retorna null em um dos caminhos do codigo, sem chamar $proceed() nesse caminho. Qual e a consequencia direta?',o:['O metodo original roda normalmente em paralelo, de qualquer forma','O metodo original nao executa nesse caminho; pode ser um short-circuit intencional, mas e perigoso se for esquecimento','Magento lanca uma excecao de plugin incompleto automaticamente','O proximo plugin da cadeia assume a execucao do metodo original'],a:[1],e:'Sem chamar $proceed(), o metodo original e pulado silenciosamente nesse caminho; e uma tecnica valida para short-circuit intencional, mas um bug grave se acidental.'},
+{d:'Architecture',t:'Plugins',q:'Um before plugin para beforeSetName(string $name) tem apenas esse parametro e faz "return $name;" pensando em nao alterar nada. Qual e o problema real com isso?',o:['Nao ha problema, o comportamento fica identico ao original','O retorno deveria ser um array, mesmo com um unico argumento: return [$name]; retornar o valor escalar direto nao segue o contrato esperado','before plugins nao podem ter valor de retorno','O nome do metodo deveria ser beforeGetName, nao beforeSetName'],a:[1],e:'Before plugins devem retornar um array de argumentos (ou null para nao alterar nada); retornar o valor escalar diretamente quebra o contrato, mesmo parecendo inofensivo.'},
+{d:'Architecture',t:'Plugins',q:'E possivel declarar um plugin diretamente sobre a interface Magento Catalog ProductRepositoryInterface, em vez da classe concreta ProductRepository?',o:['Nao, plugins so funcionam sobre classes concretas','Sim, e isso intercepta todas as implementacoes registradas via Preference para aquela interface, sendo mais robusto que plugar na classe direta','Sim, mas apenas para metodos que retornam void','Nao, interfaces exigem Preference, nunca aceitam Plugin'],a:[1],e:'Plugins podem ser declarados sobre interfaces, interceptando qualquer implementacao resolvida via DI/Preference para aquele contrato.'},
+{d:'Architecture',t:'SearchCriteria',q:'Um repository precisa buscar produtos com status=1 E visibility=4. A implementacao encadeia dois addFilter() no SearchCriteriaBuilder, um para cada campo. O resultado logico e:',o:['OR entre as duas condicoes','AND entre as duas condicoes, pois cada addFilter() sem grupo cria um FilterGroup separado','Depende da ordem em que os addFilter() sao chamados','Erro de sintaxe, pois SearchCriteriaBuilder nao aceita dois campos diferentes'],a:[1],e:'Cada addFilter() sem group cria um FilterGroup proprio; grupos diferentes sao combinados com AND. Para OR, os filtros devem estar no mesmo FilterGroup via FilterGroupBuilder.'},
+{d:'Architecture',t:'DI',q:'Uma classe precisa instanciar varios objetos Product dentro de um loop de importacao de milhares de linhas. Qual e a abordagem correta, evitando o antipattern de instanciar classes injetaveis diretamente com new?',o:['Injetar ProductFactory e chamar ->create() a cada iteracao','Injetar ProductRepositoryProxy para lazy loading dentro do loop','Chamar ObjectManager::getInstance()->create() a cada iteracao','Injetar Product diretamente e usar clone a cada iteracao'],a:[0],e:'Factory (sufixo Factory) e o mecanismo correto para criar multiplas instancias; Proxy serve para lazy loading de dependencias pesadas e raramente usadas, nao para criar varias entidades.'},
+{d:'Architecture',t:'Service Contracts',q:'Um desenvolvedor cria etc/adminhtml/extension_attributes.xml esperando que o extension attribute so exista no contexto admin. Isso funciona como esperado?',o:['Sim, extension_attributes.xml pode ser escopado por area, igual di.xml','Nao, extension_attributes.xml deve ficar em etc/ (global); nao existe escopo frontend ou adminhtml para esse arquivo','Sim, mas apenas se tambem for declarado em webapi.xml','Nao, o correto seria colocar em etc/webapi_rest/'],a:[1],e:'extension_attributes.xml e sempre global e fica em etc/; versoes colocadas em etc/frontend/ ou etc/adminhtml/ simplesmente nao sao reconhecidas.'},
+{d:'Architecture',t:'Cron',q:'Um cliente quer que o schedule de um cron job seja alteravel pelo admin, sem editar XML nem fazer novo deploy toda vez que mudar o horario. Qual abordagem em crontab.xml suporta isso?',o:['Usar <schedule>0 2 * * *</schedule> fixo no XML','Usar <config_path>vendor_module/cron/schedule</config_path> apontando para um campo configurado em system.xml','Criar um segundo job identico com um schedule diferente','Usar cron_groups.xml para definir o horario do job'],a:[1],e:'<config_path> busca o valor do schedule em core_config_data, permitindo que o admin altere via um campo configurado em system.xml; <schedule> fixo exige editar o XML e fazer deploy.'},
+{d:'Architecture',t:'Plugins',q:'Um after plugin em afterGetName faz apenas um log e depois "return null;", pensando em nao alterar o comportamento original. Qual e o efeito real disso?',o:['Nenhum, null em after e ignorado igual acontece em before','getName() passa a retornar null para qualquer chamador desse objeto, sobrescrevendo o valor original de forma silenciosa','O Magento lanca um TypeError imediatamente ao rodar o plugin','O plugin e automaticamente desabilitado pelo compiler de DI'],a:[1],e:'Diferente de before, um after plugin que retorna null substitui de fato o resultado original por null; para nao alterar nada, o correto e "return $result;".'},
+{d:'Architecture',t:'Plugins',q:'O metodo original e public function process(): void. Como deve ser a assinatura correta de um after plugin para esse metodo?',o:['function afterProcess($subject, $result): void { return $result; }','function afterProcess($subject): void { }','function afterProcess($subject, ?bool $result): bool { return true; }','After plugins nao sao permitidos em metodos void'],a:[1],e:'Metodos void nao tem $result a receber; o after plugin correto para esse caso recebe apenas $subject e nao retorna valor.'},
+{d:'Architecture',t:'Plugins',q:'Um desenvolvedor quer interceptar um metodo de uma classe do mesmo modulo dele, apenas para reaproveitar uma logica interna especifica. Qual e a abordagem recomendada em vez de criar um Plugin?',o:['Plugin around, pois e o mecanismo mais flexivel disponivel','Heranca direta, eventos internos, ou extrair a logica para um Service compartilhado','Preference, ja que e uma classe do proprio modulo','Virtual type apontando para a mesma classe original'],a:[1],e:'Plugins sao pensados para modificar comportamento de classes de outros modulos sem alterar o codigo-fonte; dentro do proprio modulo, heranca ou um Service e a pratica recomendada.'},
+{d:'Architecture',t:'DI',q:'Um virtualType para um logger customizado precisa gerar uma nova instancia isolada toda vez que for injetado, sem compartilhar estado entre pontos de injecao. Qual configuracao no virtualType garante isso?',o:['shared="true" (o padrao)','shared="false"','singleton="false"','scope="isolated"'],a:[1],e:'shared="false" forca uma nova instancia por ponto de injecao; o padrao shared="true" reaproveita a mesma instancia (comportamento singleton).'},
+{d:'Architecture',t:'Layout',q:'Um <block class="Vendor_Module_Block_Custom" name="my.block"/> foi declarado sem atributo template e sem herdar de outro bloco com template definido. O que acontece ao carregar a pagina?',o:['Erro fatal informando que o template esta ausente','O bloco pode nao produzir saida visivel, mas sem lancar excecao fatal imediata - falha silenciosa tipica de diagnosticar','O Magento aplica automaticamente um template default generico','O bloco vira um container automaticamente por falta de template'],a:[1],e:'Bloco sem template (nem heranca de template) tende a nao gerar saida visivel sem lancar excecao, tornando esse tipo de erro dificil de detectar em revisao rapida.'},
+{d:'Architecture',t:'Layout',q:'Um layout customizado usa <update handle="customer_account"/> dentro de catalog_product_view.xml. O que essa tag realmente faz nesse contexto?',o:['Redireciona a pagina de produto para a pagina de conta do cliente','Inclui a estrutura de blocos e containers declarados no handle customer_account dentro do contexto atual','Aplica o tema inteiro usado na area de customer account','Cria uma rota alternativa apontando para o handle informado'],a:[1],e:'<update handle="..."/> reaproveita a definicao de outro handle dentro do handle atual; nao redireciona nem troca tema, apenas inclui a estrutura declarada la.'},
+{d:'Architecture',t:'Database',q:'Um desenvolvedor precisa converter uma coluna existente de INT para VARCHAR aplicando uma transformacao de dados durante a migracao, algo que o db_schema.xml declarativo nao suporta nativamente. Qual mecanismo usar?',o:['Data Patch, pois lida com qualquer tipo de alteracao no banco','Schema Patch, que usa SchemaSetupInterface para operacoes DDL complexas fora do alcance do declarativo','InstallSchema.php, ainda recomendado para esse tipo de operacao no Magento 2 atual','Editar db_schema.xml manualmente e rodar apenas setup:upgrade'],a:[1],e:'Schema Patch (SchemaPatchInterface) e o mecanismo para DDL complexo fora do alcance do db_schema.xml declarativo; Data Patch e voltado para dados, nao estrutura de tabela.'},
+{d:'Architecture',t:'Modulos',q:'Um modulo tem etc/module.xml correto, mas bin/magento module:status nao lista o modulo, como se ele nao existisse. Qual e a causa mais provavel?',o:['Falta ou erro em registration.php, responsavel por registrar o modulo no ComponentRegistrar','Falta de <sequence> declarado em module.xml','setup_version desatualizado em module.xml','Falta rodar bin/magento setup:di:compile'],a:[0],e:'registration.php e o arquivo que registra o modulo em runtime; sem ele (ou com erro nele), o Magento nao reconhece o modulo mesmo com module.xml correto.'},
+{d:'Architecture',t:'Database',q:'Uma classe representa uma unica entidade, expoe getName()/setName() com regras de negocio, e delega toda a persistencia em banco para outra classe. Que tipo de classe e essa na arquitetura do Magento?',o:['Resource Model','Collection','Data Model','View Model'],a:[2],e:'Data Model concentra a entidade e a logica de negocio, delegando o CRUD SQL ao Resource Model correspondente.'},
+{d:'Architecture',t:'Cron',q:'Um time quer isolar jobs pesados em um grupo de cron proprio, com timeout e schedule_ahead_for diferentes do grupo default, sem alterar os jobs em si. Onde essa configuracao de grupo deve ficar?',o:['etc/crontab.xml, dentro do proprio <job>','etc/cron_groups.xml, declarando um novo <group id="...">','etc/di.xml, via virtual type do grupo de cron','system.xml, como um campo configuravel pelo admin'],a:[1],e:'crontab.xml declara os jobs individuais (nome, classe, schedule); as propriedades do grupo, como timeout e schedule_ahead_for, ficam em cron_groups.xml.'},
+{d:'Architecture',t:'Admin',q:'Um controller admin novo esta acessivel por qualquer usuario logado no admin, mesmo sem a role apropriada configurada. O que provavelmente falta na implementacao?',o:['Declarar o resource correspondente em acl.xml e referencia-lo via ADMIN_RESOURCE no controller','Declarar o controller tambem em routes.xml de frontend','Adicionar o controller em menu.xml','Criar um plugin customizado de autenticacao para o controller'],a:[0],e:'Controllers admin devem declarar ADMIN_RESOURCE apontando para um recurso definido em acl.xml; sem isso, o Magento pode nao aplicar a restricao de permissao esperada.'},
+{d:'Architecture',t:'CLI',q:'Depois de adicionar um novo Plugin e tambem alterar db_schema.xml no mesmo deploy, qual ordem de comandos e a mais correta em producao?',o:['setup:di:compile, depois setup:upgrade, depois setup:static-content:deploy','setup:upgrade, depois setup:di:compile, depois setup:static-content:deploy','setup:static-content:deploy, depois setup:upgrade, depois setup:di:compile','indexer:reindex, depois setup:upgrade, depois setup:di:compile'],a:[1],e:'setup:upgrade aplica schema/config primeiro; setup:di:compile compila os interceptors gerados pelo novo plugin; so depois faz sentido gerar os arquivos estaticos.'},
+{d:'Architecture',t:'GraphQL',q:'Um modulo GraphQL customizado nao segue a convencao {Vendor}_{Module}GraphQl, tendo o schema.graphqls dentro de um modulo de dominio comum. Qual e a consequencia mais provavel?',o:['O schema e completamente ignorado pelo Magento e nada funciona','O schema pode funcionar tecnicamente, mas quebra a convencao de nomenclatura esperada em revisoes e no exame','Magento cria automaticamente um modulo GraphQl separado para corrigir isso','O GraphQL so funciona se o schema estiver em Magento_CatalogGraphQl'],a:[1],e:'Tecnicamente o schema pode ser carregado, mas a pratica e a convencao esperada e ter um modulo dedicado com sufixo GraphQl para organizar schemas e resolvers.'},
+
+{d:'Customizations',t:'Produtos',q:'Em um produto Configurable com 3 variacoes (P, M, G), onde fica o controle real de estoque, quantidade e salable quantity?',o:['No produto pai configurable','Em cada produto simples associado (filho)','Em uma tabela separada de configurable_stock','No attribute set do produto'],a:[1],e:'O estoque e controlado individualmente pelos produtos simples associados; o produto pai configurable nao possui estoque proprio.'},
+{d:'Customizations',t:'Produtos',q:'Um atributo com input_type dropdown e scope Store View nao aparece como opcao disponivel ao configurar as variacoes de um produto Configurable. Por que isso acontece?',o:['O input_type precisa ser multiselect, e nao dropdown','Super attributes exigem escopo Global; Website ou Store View nao sao aceitos como atributo de variacao','Falta marcar "Used in Product Listing" no atributo','O produto pai precisa estar no mesmo attribute set que os filhos'],a:[1],e:'Atributos usados como super attribute (variacao de Configurable) precisam ter escopo Global; Website ou Store View nao aparecem na tela de configuracao de variacoes.'},
+{d:'Customizations',t:'Produtos',q:'Um produto custa R$100 por unidade, com tier pricing de R$80/unidade a partir de 5 unidades. Um cliente adiciona 5 unidades ao carrinho. O que acontece com o total do pedido comparado a comprar apenas 1 unidade?',o:['O total cai, porque o preco por unidade caiu','O total sobe (R$400 contra R$100), mesmo com o preco unitario mais baixo','O total permanece igual ao de 1 unidade, por causa do desconto','O tier pricing so se aplica no checkout, nunca no carrinho'],a:[1],e:'O preco por unidade cai, mas o total ainda cresce com a quantidade (5 x R$80 = R$400, maior que R$100); a pegadinha classica e achar que o total tambem cai.'},
+{d:'Customizations',t:'Produtos',q:'Um cliente quer que cada componente de um kit apareca como linha separada no carrinho, com preco e quantidade proprios, permitindo comprar so um dos componentes se quiser. Qual tipo de produto atende esse requisito?',o:['Bundle com opcoes fixas','Grouped Product','Configurable Product','Virtual Product'],a:[1],e:'Grouped agrupa produtos simples independentes, cada um com seu proprio line item no carrinho; Bundle vira um unico line item.'},
+{d:'Customizations',t:'Catalogo',q:'O time de atendimento quer um status customizado "aguardando_conferencia" para pedidos no estado processing, visivel e selecionavel no admin. Isso e possivel sem alterar codigo core?',o:['Nao, states e statuses so podem ser criados via desenvolvimento','Sim, um novo Status pode ser criado via Admin (Stores > Order Status) e associado a um State existente','Sim, mas exige tambem criar um State customizado novo','Nao, apenas plugins podem adicionar novos status de pedido'],a:[1],e:'Status e ilimitado e configuravel via admin, sempre associado a um dos cerca de 8 States fixos do core; criar um novo State exige codigo (setup script), mas Status nao precisa.'},
+{d:'Customizations',t:'Checkout',q:'Um novo step precisa ser inserido no fluxo de checkout, entre shipping e payment, exibindo um formulario customizado que reage em tempo real as escolhas do cliente. Qual e a abordagem principal usada pelo Magento para isso?',o:['Alterar checkout_index_index.xml adicionando blocos phtml tradicionais','Extender o layout e os UI Components JS do checkout (knockout, uiComponent), registrando o step via layoutProcessor','Criar um novo controller PHP dedicado para o step','Sobrescrever CheckoutSession via Preference'],a:[1],e:'O checkout moderno e orientado a UI Components/Knockout; novos steps sao adicionados via layoutProcessor JS e configuracao de layout, nao blocos phtml tradicionais.'},
+{d:'Customizations',t:'Checkout',q:'Um total customizado, como uma taxa de servico, precisa aparecer no resumo do carrinho e ser recalculado automaticamente a cada mudanca de quantidade ou endereco. Qual mecanismo suporta isso corretamente?',o:['Um Observer no evento sales_quote_save_after, recalculando manualmente','Uma classe que estende AbstractTotal, registrada em etc/sales.xml no pipeline de totais','Um Plugin around no metodo getGrandTotal() do quote','Um Cart Price Rule configurado com desconto negativo'],a:[1],e:'Totais customizados usam o pipeline de total collectors declarado em sales.xml, estendendo AbstractTotal; isso garante recalculo automatico junto com os demais totais do quote.'},
+{d:'Customizations',t:'Payment',q:'O cliente quer aceitar pagamento apenas no momento da entrega, sem gateway online envolvido. Qual metodo de pagamento nativo atende esse caso sem desenvolvimento customizado?',o:['Zero Subtotal Checkout','Cash On Delivery','Bank Transfer Payment','Purchase Order'],a:[1],e:'Cash On Delivery e o metodo nativo pensado especificamente para pagamento realizado no momento da entrega.'},
+{d:'Customizations',t:'Cart Rules',q:'Um desenvolvedor tenta criar uma Cart Price Rule usando "Created At" do produto como condicao e nao encontra essa opcao na lista de atributos disponiveis. Qual e a explicacao mais precisa?',o:['E um bug e basta reindexar catalogsearch_fulltext para o atributo aparecer','Atributos de sistema/status, como created_at ou stock status, geralmente nao ficam disponiveis por padrao como condicao em cart/catalog price rules','A condicao so aparece em Catalog Price Rules, nunca em Cart Price Rules','Falta marcar esse atributo de sistema como "Used for Promo Rule Conditions"'],a:[1],e:'Atributos de sistema/status como created_at nao aparecem por padrao como condicao dessas regras; ja atributos customizados EAV so aparecem quando marcados com "Used for Promo Rule Conditions", o que e um caso diferente.'},
+{d:'Customizations',t:'APIs',q:'Uma nova rota REST precisa ser exposta apenas para usuarios admin autenticados com um recurso ACL especifico. Onde exatamente essa relacao entre rota, metodo HTTP e permissao e declarada?',o:['Somente em acl.xml','Em webapi.xml, atraves de <route> com <resources><resource ref="..."/></resources> apontando para o recurso ACL','Em routes.xml da area webapi_rest','Em di.xml, atraves de um virtual type de autenticacao'],a:[1],e:'webapi.xml declara a rota, o metodo HTTP, o service/method chamado e o resource ACL exigido para acessar o endpoint.'},
+{d:'Customizations',t:'GraphQL',q:'Um schema.graphqls customizado foi colocado dentro de Vendor_CustomModule/etc/schema.graphqls, sem que o modulo tenha o sufixo GraphQl no nome. Isso funciona?',o:['Nao, GraphQL exige obrigatoriamente um modulo dedicado com sufixo GraphQl, senao o schema e ignorado por completo','Tecnicamente pode funcionar, mas vai contra a convencao {Vendor}_{Module}GraphQl esperada pelas boas praticas e pelo exame','Sim, e a forma recomendada quando o modulo ja tem outras responsabilidades de dominio','Nao, schema.graphqls so pode existir dentro de Magento_CatalogGraphQl'],a:[1],e:'Colocar schema.graphqls fora de um modulo com sufixo GraphQl pode funcionar tecnicamente, mas quebra a convencao {Vendor}_{Module}GraphQl esperada pelo Magento e cobrada no exame.'},
+{d:'Customizations',t:'SaaS',q:'Depois de atualizar produtos em lote, o time percebe que as recomendacoes do Adobe Commerce Product Recommendations (SaaS) nao refletem as mudancas recentes. Qual comando forca a ressincronizacao do feed de produtos?',o:['bin/magento indexer:reindex catalog_product_price','bin/magento saas:resync --feed=products','bin/magento cache:flush','bin/magento cron:run --group=index'],a:[1],e:'saas:resync permite ressincronizar manualmente feeds especificos usados pelos servicos SaaS, como Product Recommendations.'},
+{d:'Customizations',t:'API Mesh',q:'Uma loja precisa combinar dados do Adobe Commerce com uma API de frete de terceiros em uma unica query GraphQL consumida pelo frontend. Qual servico Adobe resolve isso sem duplicar logica de integracao no backend Commerce?',o:['API Mesh','Live Search','Product Recommendations','Data Space'],a:[0],e:'API Mesh agrega multiplas fontes, incluindo Commerce e APIs externas, em um endpoint GraphQL unificado.'},
+{d:'Customizations',t:'Entidades',q:'Um plugin precisa alterar um total antes do pedido ser criado, ainda durante o processo de checkout do cliente. Em qual entidade essa logica deve atuar?',o:['Order, pois e a entidade final do processo','Quote, que representa o carrinho/orcamento antes da conversao em Order','Invoice, pois calcula os valores finais do pedido','Shipment, que controla os totais relacionados a frete'],a:[1],e:'Quote e o carrinho/orcamento manipulado durante o checkout; Order so existe depois da conversao (place order), quando ja e tarde para alterar totais dessa forma.'},
+{d:'Customizations',t:'Entidades',q:'Um parceiro externo precisa receber um campo calculado, nao persistido em coluna propria, junto com o payload padrao de Order via API REST, sem alterar o schema core. Qual e o mecanismo indicado?',o:['Criar um atributo EAV para sales_order','Extension Attributes declarado em etc/extension_attributes.xml, resolvido via Plugin no getExtensionAttributes()','Adicionar a coluna diretamente em sales_order via db_schema.xml','Sobrescrever OrderRepositoryInterface via Preference'],a:[1],e:'Extension attributes existem exatamente para estender o payload de service contracts sem alterar o schema core; alem disso, sales_order nem usa o modelo EAV.'},
+{d:'Customizations',t:'Quote Modules',q:'Ao investigar por que as opcoes de um produto Configurable selecionadas pelo cliente nao sao recuperadas corretamente ao carregar o quote, qual modulo e mais provavel de conter o bug, considerando que ele gerencia especificamente as SELECOES de opcoes configuraveis no quote?',o:['Magento_QuoteConfigurable','Magento_QuoteConfigurableOptions','Magento_ConfigurableProduct','Magento_CatalogInventory'],a:[1],e:'Magento_QuoteConfigurableOptions e o modulo responsavel por armazenar e gerenciar as opcoes configuraveis selecionadas no quote; QuoteConfigurable da apenas o suporte generico de integracao.'},
+{d:'Customizations',t:'SEO',q:'Produtos aparecem com multiplas URLs diferentes dependendo da categoria de navegacao usada para chegar ate eles, causando conteudo duplicado para SEO. Qual configuracao resolve isso mantendo uma URL unica por produto?',o:['Product URL Suffix = .html','Use Categories Path for Product URLs = No','Anchor = No em todas as categorias do catalogo','Price Scope = Website'],a:[1],e:'Desativar o uso do caminho de categoria na URL do produto elimina a duplicidade de URLs por categoria de navegacao, mantendo uma URL canonica por produto.'},
+{d:'Customizations',t:'Invoice',q:'Um modulo precisa gerar automaticamente uma invoice assim que o pedido e criado, sem intervencao manual no admin. Em qual camada isso deve ser implementado, seguindo as boas praticas?',o:['Um Observer no evento sales_order_place_after, usando InvoiceService para criar e registrar a invoice','Um Plugin around em OrderRepository::save()','Diretamente dentro do controller de checkout','Um cron job diario que verifica pedidos sem invoice'],a:[0],e:'A pratica recomendada e reagir ao evento de criacao do pedido via Observer e usar o InvoiceService (service contract) para gerar e registrar a fatura, mantendo o fluxo de sales desacoplado.'},
+{d:'Customizations',t:'Async',q:'Um processo pesado de exportacao precisa rodar de forma assincrona, desacoplado da requisicao HTTP que o disparou, com suporte a retry automatico em caso de falha. Qual mecanismo do Magento e o mais adequado?',o:['Um Observer sincrono no evento correspondente ao disparo','Message Queue (RabbitMQ) via queue.xml/queue_topology.xml e um Consumer dedicado','Um Cron job rodando a cada minuto verificando pendencias','Um Plugin around que adia a execucao chamando sleep()'],a:[1],e:'Message Queues sao o mecanismo nativo para processamento assincrono e desacoplado, com suporte a consumers e retry, diferente de cron (intervalos fixos) ou observers sincronos.'},
+{d:'Customizations',t:'MSI',q:'Depois de habilitar Multi-Source Inventory, um produto mostra "In Stock" no admin, mas o storefront exibe "Out of Stock" para clientes de um source especifico. Qual conceito do MSI explica essa diferenca entre quantidade fisica e quantidade realmente vendavel?',o:['Salable Quantity, que desconta reservas (reservations) pendentes da quantidade fisica do source','Stock Status, que e sempre identico entre admin e storefront','Source Selection Algorithm, que so define prioridade entre sources','O indexer catalog_product_price desatualizado'],a:[0],e:'Salable Quantity considera quantidade fisica menos reservas pendentes; e possivel ter estoque fisico positivo mas salable quantity zero, causando "Out of Stock" no storefront mesmo com estoque no admin.'},
+{d:'Customizations',t:'Produtos',q:'Um Bundle Product precisa que o preco final seja a soma dos precos das opcoes escolhidas pelo cliente, e nao um valor fixo definido no produto pai. Qual configuracao do Bundle garante esse comportamento?',o:['Price Type = Fixed','Price Type = Dynamic','Weight Type = Dynamic, isoladamente','Shipment Type = Together'],a:[1],e:'Price Type Dynamic soma os precos das selecoes feitas pelo cliente; Fixed usa um preco unico definido no produto pai, independente das opcoes escolhidas.'},
+{d:'Customizations',t:'Marketing',q:'O time de marketing quer segmentar clientes por "Purchase Total acumulado" como uma condicao direta de atributo em Customer Segments. Isso e suportado nativamente dessa forma?',o:['Sim, existe um atributo Purchase Total disponivel diretamente no segmento','Nao, valores agregados de compra nao sao condicao de atributo direto; segmentos usam condicoes de comportamento/historico de pedidos, nao um atributo simples','Sim, mas apenas quando combinado com a condicao Gender','Nao, customer segments nao suporta nenhum tipo de condicao relacionada a compras'],a:[1],e:'Purchase Total como atributo direto nao existe; segmentos usam condicoes de comportamento, como historico de pedidos, diferente de atributos simples como email, data de nascimento ou grupo.'},
+{d:'Customizations',t:'Precos',q:'Um produto precisa ter precos diferentes para o grupo de clientes "Wholesale", sem criar SKUs diferentes por grupo nem duplicar o produto. Qual mecanismo nativo atende esse requisito?',o:['Tier Price / Customer Group Price associado ao grupo de cliente','Website Scope aplicado ao atributo price do produto','Um atributo customizado chamado price_wholesale','Cart Price Rule com desconto percentual igual para todos os grupos'],a:[0],e:'Precos por grupo de cliente, seja via tier price com grupo especifico ou customer group price, permitem valores diferentes sem duplicar SKU nem criar produto novo.'},
+{d:'Customizations',t:'GraphQL',q:'Uma query GraphQL customizada retorna dados especificos por cliente logado, mas precisa ser cacheavel no Varnish/FPC de forma segura, variando corretamente por contexto (como customer group). Qual diretiva no schema.graphqls resolve isso?',o:['@doc','@cache(cacheIdentity: "Vendor_Module_..._CacheIdentity")','@deprecated','@resolver'],a:[1],e:'@cache com cacheIdentity define a estrategia de identidade de cache da query, permitindo cache seguro e segmentado por contexto no schema GraphQL.'},
+{d:'Customizations',t:'Checkout',q:'Um campo customizado no checkout precisa validar formato via regex no navegador e garantir unicidade no banco antes de confirmar o pedido. Qual combinacao de validacao e a correta?',o:['Apenas validacao JS no frontend, confiando no formato recebido do cliente','Validacao JS/Knockout para formato (UX) e validacao server-side (Plugin/Observer) para unicidade, sempre antes de confirmar o pedido','Apenas validacao no backend via cron noturno, depois do pedido ja criado','Apenas required=true no campo, sem nenhuma logica adicional'],a:[1],e:'Formato pode ser validado no cliente para melhorar a UX, mas garantias que dependem de estado compartilhado, como unicidade no banco, devem sempre ser validadas no backend antes da confirmacao.'},
+{d:'Customizations',t:'Precos',q:'Ao configurar Price Scope como Website em uma instalacao multi-website, um produto precisa ter o mesmo SKU mas precos diferentes por pais/website. Isso e suportado sem duplicar o produto?',o:['Nao, SKU e sempre global e o preco tambem, entao seria preciso duplicar o produto por website','Sim, quando Price Scope = Website, o mesmo produto (mesmo SKU) pode ter valores de preco diferentes por website','Sim, mas apenas duplicando o atributo price por Store View, nao por Website','Nao, price scope so afeta a moeda exibida, nunca o valor numerico'],a:[1],e:'Com Price Scope = Website, o preco passa a ser configuravel por website mantendo o mesmo produto/SKU; nao e necessario duplicar o produto para isso.'},
+
+{d:'Cloud',t:'Config Files',q:'Um projeto Cloud precisa configurar hooks de build/deploy, tipo de runtime PHP e crons da aplicacao. Em qual arquivo isso e declarado?',o:['.magento.app.yaml','.magento.env.yaml','services.yaml','routes.yaml'],a:[0],e:'.magento.app.yaml e o arquivo de configuracao da aplicacao: runtime, hooks, mounts, crons e dependencies.'},
+{d:'Cloud',t:'Config Files',q:'O time quer configurar variaveis usadas pelo ece-tools durante os estagios de build, deploy e post-deploy, como threads de static content deploy ou modo da aplicacao. Onde isso fica declarado?',o:['.magento.env.yaml','.magento.app.yaml','services.yaml','app/etc/env.php versionado no repositorio'],a:[0],e:'.magento.env.yaml e o arquivo consumido pelo ece-tools para configurar as etapas de build, deploy e post-deploy.'},
+{d:'Cloud',t:'Config Files',q:'Uma equipe precisa provisionar Redis, RabbitMQ e OpenSearch para o ambiente Cloud, especificando versoes. Qual arquivo declara esses servicos?',o:['services.yaml','routes.yaml','.magento.app.yaml','composer.json'],a:[0],e:'services.yaml descreve os servicos e versoes provisionados para o projeto, como MySQL, Redis, RabbitMQ e OpenSearch/Elasticsearch.'},
+{d:'Cloud',t:'CLI Cloud',q:'Um desenvolvedor tenta rodar magento-cloud environment:backup antes de um deploy arriscado e recebe erro de comando desconhecido. Qual e o comando correto para criar um snapshot do ambiente?',o:['magento-cloud snapshot:create','magento-cloud backup:environment','magento-cloud environment:snapshot','magento-cloud environment:save'],a:[0],e:'O comando correto e snapshot:create; environment:backup nao existe no Cloud CLI, sendo uma pegadinha comum.'},
+{d:'Cloud',t:'Diretorios',q:'Depois do deploy em producao, uma tentativa de gravar arquivos em app/code via um script customizado falha silenciosamente. Qual e a explicacao correta?',o:['app/code e read-only apos o deploy no ambiente Cloud; apenas var, pub/static, pub/media e /tmp sao writable em runtime','O usuario do processo PHP nao tem UID configurado corretamente','Falta rodar bin/magento setup:permissions:reset apos o deploy','app/code so e writable no ambiente Integration, nunca em Production'],a:[0],e:'No Cloud, app/code e app/design sao read-only apos o deploy; os diretorios writable em runtime sao var, pub/static, pub/media e /tmp.'},
+{d:'Cloud',t:'Planos',q:'Um cliente no plano Starter pede 4 ambientes de integracao ativos rodando em paralelo para diferentes features. Isso e suportado no plano atual?',o:['Sim, o plano Starter suporta ambientes ilimitados','Nao, Starter suporta no maximo 2 ambientes de integracao ativos; ambientes ilimitados sao exclusivos do plano Pro','Sim, mas apenas se os ambientes forem sandbox branches','Nao, nenhum plano Cloud suporta mais de 1 ambiente ativo por vez'],a:[1],e:'Starter limita a 2 environments de integracao ativos; Pro permite desenvolvimento paralelo com ambientes ilimitados.'},
+{d:'Cloud',t:'Tech Stack',q:'Qual combinacao de componentes do stack tecnico do Adobe Commerce Cloud esta correta?',o:['CDN: Akamai / Web server: Apache / Cache: Memcached','CDN: Fastly / Web server: NGINX / Cache-Sessoes: Redis / Storage distribuido: GlusterFS','CDN: Cloudflare / Web server: NGINX / Cache: Varnish apenas, sem Redis','CDN: Fastly / Web server: Apache / DB cluster: Redis Cluster'],a:[1],e:'O stack correto usa Fastly como CDN, NGINX como web server, Redis para cache/sessoes e GlusterFS para storage distribuido; Galera cuida do cluster de banco MySQL.'},
+{d:'Cloud',t:'Hooks',q:'A equipe quer rodar health checks e cache warm-up depois que a aplicacao ja esta totalmente deployada e acessivel, sem impactar o maintenance mode usado durante o deploy. Qual hook e o correto para isso?',o:['build','deploy','post_deploy','pre_schema'],a:[2],e:'post_deploy roda depois do deploy, com a aplicacao ja acessivel, sendo ideal para warm-up, health checks e notificacoes; o hook deploy roda com maintenance mode ativo.'},
+{d:'Cloud',t:'Cron',q:'Um job de importacao demora 40 minutos e roda no cron do ambiente web em producao. O time percebe atrasos em outros jobs de cron durante essa execucao. Qual e a recomendacao da Adobe para esse cenario?',o:['Aumentar a frequencia do cron group default para compensar','Quebrar o job em partes menores/enfileiradas ou mover para um ambiente worker dedicado, ja que o ambiente web do Cloud processa cron de forma limitada','Rodar o job manualmente via SSH todos os dias, fora do cron','Desabilitar cron:run e usar apenas cron:install repetidamente'],a:[1],e:'A recomendacao para cargas longas e dividir em tarefas menores/filas ou usar um worker dedicado, pois jobs longos no ambiente web atrasam os demais crons agendados.'},
+{d:'Cloud',t:'Estrutura',q:'Durante uma auditoria, o time precisa localizar rapidamente todos os arquivos de configuracao especificos do Adobe Commerce Cloud dentro do repositorio. Onde eles costumam estar?',o:['Exclusivamente dentro de app/etc/','Na pasta .magento/ e em arquivos que comecam com .magento. na raiz do projeto, como .magento.app.yaml','Dentro de vendor/magento/cloud-components apenas','Em pub/cloud/config/, criado automaticamente no primeiro deploy'],a:[1],e:'Os arquivos de configuracao Cloud ficam tipicamente na raiz do projeto com prefixo .magento. e na pasta .magento/, e nao dentro de app/etc/.'}
+];
+
+let state={mode:'exam',questions:[],idx:0,answers:[],review:new Set(),checked:new Set(),seconds:0,timerId:null,finished:false};
+
+const $=id=>document.getElementById(id);
+const shuffle=arr=>arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]);
+const byDomain=d=>BANK.filter(q=>q.d===d);
+
+function pickWeighted(count){
+  if(count===50){
+    return [
+      ...shuffle(byDomain('Architecture')).slice(0,26),
+      ...shuffle(byDomain('Customizations')).slice(0,18),
+      ...shuffle(byDomain('Cloud')).slice(0,6)
+    ].sort(()=>Math.random()-.5);
+  }
+  const arch=Math.round(count*.52), cust=Math.round(count*.36), cloud=Math.max(1,count-arch-cust);
+  return [
+    ...shuffle(byDomain('Architecture')).slice(0,arch),
+    ...shuffle(byDomain('Customizations')).slice(0,cust),
+    ...shuffle(byDomain('Cloud')).slice(0,cloud)
+  ].slice(0,count).sort(()=>Math.random()-.5);
+}
+
+function buildQuestions(){
+  const mode=document.querySelector('input[name="mode"]:checked').value;
+  const count=Number($('countSelect').value);
+  const domain=$('domainSelect').value;
+  if(mode==='cloud') return shuffle(byDomain('Cloud')).slice(0,Math.min(count,byDomain('Cloud').length));
+  if(mode==='exam') return pickWeighted(50);
+  if(domain!=='all') return shuffle(byDomain(domain)).slice(0,Math.min(count,byDomain(domain).length));
+  return pickWeighted(count);
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+function start(){
+  clearInterval(state.timerId);
+  state.mode=document.querySelector('input[name="mode"]:checked').value;
+  state.questions=buildQuestions();
+  state.idx=0;
+  state.answers=state.questions.map(()=>[]);
+  state.review=new Set();
+  state.checked=new Set();
+  state.finished=false;
+  const timerMode=$('timerSelect').value;
+  state.seconds=timerMode==='off'?0:Math.round(state.questions.length*120);
+  $('progressBox').style.display='block';
+  $('modeLabel').textContent=state.mode==='exam'?'Prova real':state.mode==='cloud'?'Reforco Cloud':'Treino em tempo real';
+  showScreen('quizScreen');
+  buildNav();
+  render();
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(state.timerId);
+  if($('timerSelect').value==='off'){ $('timer').textContent='sem timer'; return; }
+  tick();
+  state.timerId=setInterval(()=>{
+    state.seconds--;
+    tick();
+    if(state.seconds<=0) finish();
+  },1000);
+}
+
+function tick(){
+  const m=Math.max(0,Math.floor(state.seconds/60));
+  const s=Math.max(0,state.seconds%60);
+  $('timer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function buildNav(){
+  $('navgrid').innerHTML='';
+  state.questions.forEach((_,i)=>{
+    const b=document.createElement('button');
+    b.className='navbtn';
+    b.textContent=i+1;
+    b.onclick=()=>{state.idx=i;render();};
+    $('navgrid').appendChild(b);
+  });
+}
+
+function render(){
+  const q=state.questions[state.idx];
+  $('qNumber').textContent=`${state.idx+1}/${state.questions.length}`;
+  $('qDomain').textContent=q.d;
+  $('qTopic').textContent=q.t;
+  $('qText').textContent=q.q;
+  $('qHint').textContent=q.a.length>1?'Escolha todas as alternativas corretas.':'Escolha uma alternativa.';
+  $('options').innerHTML='';
+  q.o.forEach((text,i)=>{
+    const selected=state.answers[state.idx].includes(i);
+    const checked=state.checked.has(state.idx);
+    const b=document.createElement('button');
+    b.className='option'+(selected?' selected':'');
+    if(checked){
+      if(q.a.includes(i)) b.classList.add('correct');
+      else if(selected) b.classList.add('wrong');
+    }
+    b.innerHTML=`<span class="letter">${String.fromCharCode(65+i)}</span><span>${text}</span>`;
+    b.onclick=()=>selectOption(i);
+    $('options').appendChild(b);
+  });
+  $('feedback').className='feedback';
+  $('feedback').innerHTML='';
+  if(state.checked.has(state.idx)) showFeedback();
+  $('prevBtn').disabled=state.idx===0;
+  $('nextBtn').textContent=state.idx===state.questions.length-1?'Ultima':'Proxima';
+  $('reviewBtn').textContent=state.review.has(state.idx)?'Desmarcar revisao':'Marcar revisao';
+  $('checkBtn').style.display=state.mode==='exam'?'none':'inline-block';
+  updateProgress();
+}
+
+function selectOption(i){
+  const q=state.questions[state.idx];
+  if(state.checked.has(state.idx) && state.mode!=='exam') return;
+  const ans=state.answers[state.idx];
+  if(q.a.length===1){
+    state.answers[state.idx]=[i];
+  }else{
+    state.answers[state.idx]=ans.includes(i)?ans.filter(x=>x!==i):[...ans,i];
+  }
+  render();
+}
+
+function arraysEqual(a,b){
+  const aa=[...a].sort((x,y)=>x-y), bb=[...b].sort((x,y)=>x-y);
+  return aa.length===bb.length && aa.every((v,i)=>v===bb[i]);
+}
+
+function check(){
+  if(!state.answers[state.idx].length) return;
+  state.checked.add(state.idx);
+  render();
+}
+
+function showFeedback(){
+  const q=state.questions[state.idx];
+  const ok=arraysEqual(state.answers[state.idx],q.a);
+  const letters=q.a.map(i=>String.fromCharCode(65+i)).join(', ');
+  $('feedback').className='feedback show '+(ok?'good':'bad');
+  $('feedback').innerHTML=`<strong>${ok?'Correto':'Errado'}.</strong> Resposta: ${letters}. <span class="muted">${q.e}</span>`;
+}
+
+function updateProgress(){
+  const answered=state.answers.filter(a=>a.length).length;
+  $('answeredCount').textContent=`${answered}/${state.questions.length}`;
+  $('reviewCount').textContent=state.review.size;
+  [...$('navgrid').children].forEach((b,i)=>{
+    b.className='navbtn';
+    if(i===state.idx)b.classList.add('active');
+    if(state.answers[i].length)b.classList.add('answered');
+    if(state.review.has(i))b.classList.add('review');
+  });
+}
+
+function finish(){
+  if(state.finished) return;
+  state.finished=true;
+  clearInterval(state.timerId);
+  const total=state.questions.length;
+  const correct=state.questions.reduce((sum,q,i)=>sum+(arraysEqual(state.answers[i],q.a)?1:0),0);
+  const pct=Math.round(correct/total*100);
+  $('scoreText').textContent=`${correct}/${total} (${pct}%)`;
+  $('passText').textContent=pct>=78?'Aprovado no simulado. Meta batida.':'Abaixo da meta de 78%. Revise os erros e rode outro bloco.';
+  renderDomainResults();
+  localStorage.setItem('ad0e724-avancado-last',JSON.stringify({date:new Date().toISOString(),correct,total,pct}));
+  $('reviewList').innerHTML='';
+  showScreen('resultScreen');
+}
+
+function renderDomainResults(){
+  const domains=['Architecture','Customizations','Cloud'];
+  $('domainResults').innerHTML=domains.map(d=>{
+    const qs=state.questions.map((q,i)=>({q,i})).filter(x=>x.q.d===d);
+    if(!qs.length)return '';
+    const ok=qs.filter(x=>arraysEqual(state.answers[x.i],x.q.a)).length;
+    const pct=Math.round(ok/qs.length*100);
+    return `<div class="result-card"><div class="muted">${d}</div><h3>${ok}/${qs.length} (${pct}%)</h3></div>`;
+  }).join('');
+}
+
+function reviewWrong(){
+  const wrong=state.questions.map((q,i)=>({q,i})).filter(x=>!arraysEqual(state.answers[x.i],x.q.a));
+  $('reviewList').innerHTML=wrong.length?wrong.map(({q,i})=>{
+    const your=state.answers[i].length?state.answers[i].map(n=>String.fromCharCode(65+n)).join(', '):'sem resposta';
+    const right=q.a.map(n=>String.fromCharCode(65+n)).join(', ');
+    return `<div class="review-item"><strong>${i+1}. ${q.q}</strong><div class="muted">Sua: ${your} | Correta: ${right}</div><div>${q.e}</div></div>`;
+  }).join(''):'<p class="muted">Nenhum erro nesta rodada.</p>';
+}
+
+$('startBtn').onclick=start;
+$('checkBtn').onclick=check;
+$('prevBtn').onclick=()=>{if(state.idx>0){state.idx--;render();}};
+$('nextBtn').onclick=()=>{if(state.idx<state.questions.length-1){state.idx++;render();}};
+$('reviewBtn').onclick=()=>{state.review.has(state.idx)?state.review.delete(state.idx):state.review.add(state.idx);render();};
+$('finishBtn').onclick=finish;
+$('restartBtn').onclick=()=>{showScreen('setupScreen');$('progressBox').style.display='none';};
+$('reviewWrongBtn').onclick=reviewWrong;
+$('historyBtn').onclick=()=>{
+  const last=localStorage.getItem('ad0e724-avancado-last');
+  alert(last?`Ultimo resultado: ${JSON.parse(last).correct}/${JSON.parse(last).total} (${JSON.parse(last).pct}%)`:'Ainda nao tem resultado salvo neste navegador.');
+};
+document.querySelectorAll('input[name="mode"]').forEach(r=>r.onchange=()=>{
+  const mode=document.querySelector('input[name="mode"]:checked').value;
+  $('countSelect').disabled=mode==='exam';
+  $('domainSelect').disabled=mode!=='practice';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado AD0-E724</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#10131a;--panel:#171b24;--panel2:#202633;--panel3:#293142;
+  --text:#eef2ff;--muted:#aab3c7;--line:#394255;--accent:#6ee7b7;
+  --accent2:#60a5fa;--warn:#fbbf24;--bad:#fb7185;--good:#34d399;
+  --shadow:0 18px 60px rgba(0,0,0,.35);--radius:8px;
+}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.45}
+button,input,select{font:inherit}
+.app{min-height:100vh;display:grid;grid-template-columns:300px minmax(0,1fr)}
+.side{background:var(--panel);border-right:1px solid var(--line);padding:20px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{font-size:13px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.title{font-size:24px;font-weight:800;margin:8px 0 4px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:22px}
+.stat{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.stat span:first-child{color:var(--muted)}
+.pill{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted);font-size:12px;background:rgba(255,255,255,.02)}
+.domain-bars{display:grid;gap:10px;margin:16px 0}
+.bar-label{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:5px}
+.bar{height:8px;background:var(--panel3);border-radius:999px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent2);width:0%}
+.navgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:14px}
+.navbtn{height:36px;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:6px;cursor:pointer}
+.navbtn.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.navbtn.answered{background:#14362d;border-color:#256d56}
+.navbtn.review{background:#3b2f12;border-color:#7a5b13}
+.main{padding:28px;max-width:1080px;width:100%;margin:0 auto}
+.screen{display:none}
+.screen.active{display:block}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.setup{padding:28px;display:grid;gap:22px}
+.setup-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.choice-card{border:1px solid var(--line);background:var(--panel2);border-radius:var(--radius);padding:16px;cursor:pointer}
+.choice-card input{margin-right:8px}
+.choice-card strong{display:block;margin-bottom:6px}
+.choice-card small{color:var(--muted)}
+.field{display:grid;gap:7px}
+.field label{color:var(--muted);font-size:13px}
+select{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:10px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:6px;padding:10px 14px;cursor:pointer}
+.btn:hover{border-color:var(--accent2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#07120f;font-weight:800}
+.btn.danger{border-color:#7f1d1d;color:#fecaca;background:#341319}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px}
+.timer{font-variant-numeric:tabular-nums;font-weight:800;color:var(--accent)}
+.question{padding:26px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.qtext{font-size:22px;font-weight:750;margin-bottom:18px}
+.hint{color:var(--muted);font-size:14px;margin:-8px 0 16px}
+.options{display:grid;gap:10px}
+.option{width:100%;text-align:left;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:8px;padding:14px 16px;cursor:pointer;display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start}
+.option:hover{border-color:var(--accent2);background:var(--panel3)}
+.option .letter{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:var(--panel3);font-weight:800;color:var(--muted)}
+.option.selected{border-color:var(--accent);background:#14362d}
+.option.correct{border-color:var(--good);background:#12362c}
+.option.wrong{border-color:var(--bad);background:#3b151d}
+.feedback{display:none;margin-top:18px;padding:16px;border-radius:8px;background:var(--panel2);border:1px solid var(--line)}
+.feedback.show{display:block}
+.feedback.good{border-color:var(--good)}
+.feedback.bad{border-color:var(--bad)}
+.bottom{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+.results{padding:26px}
+.score{font-size:44px;font-weight:900;margin:8px 0}
+.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
+.result-card{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:14px}
+.review-list{display:grid;gap:10px;margin-top:16px}
+.review-item{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:14px}
+.review-item strong{display:block;margin-bottom:6px}
+.muted{color:var(--muted)}
+@media(max-width:860px){
+  .app{display:block}.side{position:relative;height:auto}.main{padding:16px}
+  .setup-grid,.result-grid{grid-template-columns:1fr}.qtext{font-size:19px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">Adobe Commerce</div>
+    <div class="title">AD0-E724</div>
+    <div class="sub">Simulado interativo baseado nos guias, pegadinhas e testes salvos neste workspace.</div>
+    <div class="stat"><span>Meta oficial</span><strong>39/50</strong></div>
+    <div class="stat"><span>Aprovacao</span><strong>78%</strong></div>
+    <div class="stat"><span>Tempo prova</span><strong>100 min</strong></div>
+    <div class="domain-bars">
+      <div><div class="bar-label"><span>Arquitetura</span><span id="archPct">52%</span></div><div class="bar"><i style="width:52%"></i></div></div>
+      <div><div class="bar-label"><span>Customizacoes</span><span id="custPct">36%</span></div><div class="bar"><i style="width:36%"></i></div></div>
+      <div><div class="bar-label"><span>Cloud</span><span id="cloudPct">12%</span></div><div class="bar"><i style="width:12%"></i></div></div>
+    </div>
+    <div id="progressBox" style="display:none">
+      <div class="stat"><span>Respondidas</span><strong id="answeredCount">0/50</strong></div>
+      <div class="stat"><span>Marcadas</span><strong id="reviewCount">0</strong></div>
+      <div class="navgrid" id="navgrid"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="screen active" id="setupScreen">
+      <div class="panel setup">
+        <div>
+          <span class="pill">formato prova real + treino em tempo real</span>
+          <h1>Escolhe como quer estudar agora</h1>
+          <p class="muted">No modo prova, a correcao aparece so no final. No modo treino, cada resposta ja mostra o motivo, parecido com estudar por flashcard.</p>
+        </div>
+        <div class="setup-grid">
+          <label class="choice-card">
+            <input type="radio" name="mode" value="exam" checked>
+            <strong>Prova real</strong>
+            <small>50 questoes, 100 minutos, peso 26/18/6 por dominio.</small>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="mode" value="practice">
+            <strong>Treino em tempo real</strong>
+            <small>Feedback imediato depois de confirmar cada pergunta.</small>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="mode" value="cloud">
+            <strong>Reforco Cloud</strong>
+            <small>Foco no ponto que mais apareceu fraco nos testes salvos.</small>
+          </label>
+        </div>
+        <div class="setup-grid">
+          <div class="field">
+            <label for="countSelect">Quantidade</label>
+            <select id="countSelect">
+              <option value="10">10 perguntas</option>
+              <option value="20">20 perguntas</option>
+              <option value="30">30 perguntas</option>
+              <option value="50" selected>50 perguntas</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="domainSelect">Dominio no treino</label>
+            <select id="domainSelect">
+              <option value="all">Todos</option>
+              <option value="Architecture">Arquitetura</option>
+              <option value="Customizations">Customizacoes</option>
+              <option value="Cloud">Cloud</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="timerSelect">Timer</label>
+            <select id="timerSelect">
+              <option value="real" selected>Proporcional a prova</option>
+              <option value="off">Sem timer</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="startBtn">Comecar simulado</button>
+          <button class="btn" id="historyBtn">Ver ultimo resultado</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="quizScreen">
+      <div class="topline">
+        <div><span class="pill" id="modeLabel">Prova real</span></div>
+        <div class="timer" id="timer">100:00</div>
+      </div>
+      <div class="panel question">
+        <div class="meta">
+          <span class="pill" id="qNumber">1/50</span>
+          <span class="pill" id="qDomain">Arquitetura</span>
+          <span class="pill" id="qTopic">DI</span>
+        </div>
+        <div class="qtext" id="qText"></div>
+        <div class="hint" id="qHint"></div>
+        <div class="options" id="options"></div>
+        <div class="feedback" id="feedback"></div>
+        <div class="bottom">
+          <div class="actions">
+            <button class="btn" id="prevBtn">Anterior</button>
+            <button class="btn" id="reviewBtn">Marcar revisao</button>
+          </div>
+          <div class="actions">
+            <button class="btn" id="checkBtn">Confirmar</button>
+            <button class="btn" id="nextBtn">Proxima</button>
+            <button class="btn danger" id="finishBtn">Finalizar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="resultScreen">
+      <div class="panel results">
+        <span class="pill">resultado</span>
+        <div class="score" id="scoreText">0%</div>
+        <p id="passText"></p>
+        <div class="result-grid" id="domainResults"></div>
+        <div class="actions">
+          <button class="btn primary" id="restartBtn">Novo simulado</button>
+          <button class="btn" id="reviewWrongBtn">Revisar erros</button>
+        </div>
+        <div class="review-list" id="reviewList"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const BANK=[
+{d:'Architecture',t:'Modulos',q:'Um modulo customizado nao aparece em bin/magento module:status. Qual arquivo obrigatorio provavelmente esta faltando?',o:['etc/module.xml','registration.php','composer.lock','view/frontend/layout/default.xml'],a:[1],e:'registration.php registra o modulo no ComponentRegistrar. Sem ele, o Magento ignora o modulo.'},
+{d:'Architecture',t:'Modulos',q:'Em module.xml, o que significa listar Magento_Catalog dentro de <sequence>?',o:['Seu modulo carrega antes de Magento_Catalog','Magento_Catalog carrega antes do seu modulo','Magento_Catalog sera desabilitado quando seu modulo subir','O setup_version passa a ser herdado do Catalog'],a:[1],e:'<sequence> declara dependencias que devem carregar antes do modulo atual.'},
+{d:'Architecture',t:'CLI',q:'Qual ordem de deploy em producao esta mais correta?',o:['setup:static-content:deploy, setup:upgrade, setup:di:compile, cache:flush','cache:flush, setup:upgrade, setup:static-content:deploy, setup:di:compile','setup:upgrade, setup:di:compile, setup:static-content:deploy, cache:flush','setup:di:compile, cache:flush, setup:upgrade, indexer:status'],a:[2],e:'O fluxo esperado e aplicar schema/config, compilar DI, publicar estaticos e limpar cache.'},
+{d:'Architecture',t:'CLI',q:'Qual comando gera proxies, factories e interceptors usados pelo container de DI?',o:['bin/magento setup:upgrade','bin/magento setup:di:compile','bin/magento indexer:reindex','bin/magento cache:clean'],a:[1],e:'setup:di:compile compila o container de DI e gera classes auxiliares.'},
+{d:'Architecture',t:'DI',q:'Voce precisa modificar o retorno de um metodo publico nao-final sem substituir a classe inteira. Qual mecanismo usar?',o:['Preference','Plugin after','Virtual type','Data patch'],a:[1],e:'Um after plugin recebe o retorno e pode altera-lo.'},
+{d:'Architecture',t:'DI',q:'Quando um plugin NAO pode interceptar um metodo?',o:['Quando o metodo e publico','Quando o metodo retorna array','Quando o metodo e private, final ou static','Quando a classe esta em app/code'],a:[2],e:'Plugins dependem de interceptacao de metodos publicos nao-finais.'},
+{d:'Architecture',t:'DI',q:'Qual recurso cria uma instancia configurada de uma classe sem criar uma nova classe PHP?',o:['Preference','Virtual type','Observer','ACL resource'],a:[1],e:'Virtual type define uma variacao configurada de um tipo existente no di.xml.'},
+{d:'Architecture',t:'DI',q:'Qual alternativa melhor descreve Preference?',o:['Substitui completamente a implementacao de uma classe/interface','Executa depois de um evento ser disparado','Define permissao de menu no admin','Cria valor padrao de configuracao'],a:[0],e:'Preference troca a implementacao resolvida pelo Object Manager, com maior risco de conflito.'},
+{d:'Architecture',t:'Plugins',q:'Em um around plugin com argumentos, o que deve acontecer para preservar o comportamento original?',o:['Nunca chamar $proceed','Chamar $proceed repassando os argumentos necessarios','Retornar sempre null','Declarar o plugin em events.xml'],a:[1],e:'around controla a execucao. Para chamar o metodo original, deve executar $proceed com os argumentos corretos.'},
+{d:'Architecture',t:'Events',q:'Qual arquivo registra observers para eventos?',o:['events.xml','indexer.xml','acl.xml','webapi.xml'],a:[0],e:'Observers sao declarados em events.xml global ou por area.'},
+{d:'Architecture',t:'Events',q:'Quando Observer e mais apropriado que Plugin?',o:['Quando precisa alterar retorno de metodo','Quando precisa reagir a um evento como side effect','Quando precisa interceptar metodo final','Quando precisa criar atributo EAV'],a:[1],e:'Observer reage a eventos de forma desacoplada, sem controlar diretamente argumentos/retorno.'},
+{d:'Architecture',t:'Cron',q:'Qual arquivo declara jobs de cron em um modulo?',o:['etc/crontab.xml','etc/cron.xml','etc/schedule.xml','etc/jobs.xml'],a:[0],e:'Cron jobs de modulo sao configurados em crontab.xml.'},
+{d:'Architecture',t:'Cron',q:'Qual vantagem real de usar multiplos cron groups?',o:['Eliminar necessidade de cron no servidor','Rodar conjuntos diferentes em frequencias e schedules separados','Forcar todos os jobs no mesmo minuto','Desabilitar automaticamente jobs longos'],a:[1],e:'Grupos separam tarefas por agenda/frequencia e ajudam no isolamento operacional.'},
+{d:'Architecture',t:'Indexers',q:'Qual modo de indexacao atualiza dados quando alteracoes sao salvas?',o:['Update by Schedule','Update on Save','Manual Only','Deferred Cache'],a:[1],e:'Update on Save reindexa no momento da alteracao; Update by Schedule usa cron.'},
+{d:'Architecture',t:'Indexers',q:'Qual indexer esta ligado a precos de produtos?',o:['catalog_product_price','catalog_category_product','catalogsearch_fulltext','customer_grid'],a:[0],e:'catalog_product_price materializa dados de preco para consulta eficiente.'},
+{d:'Architecture',t:'Cache',q:'Qual diferenca esta correta entre cache:clean e cache:flush?',o:['clean apaga storage inteiro; flush invalida por tag','clean invalida entradas; flush apaga o storage de cache','ambos fazem exatamente a mesma coisa','flush so funciona em developer mode'],a:[1],e:'cache:clean e mais seletivo; cache:flush limpa o backend/storage configurado.'},
+{d:'Architecture',t:'Cache',q:'Qual backend e normalmente usado para full-page cache em producao?',o:['SQLite','Varnish','Composer','Elasticsearch'],a:[1],e:'Varnish e usado como Full Page Cache em ambientes de producao.'},
+{d:'Architecture',t:'Cache',q:'Ao adicionar cache a um bloco customizado, quais dados sao relevantes?',o:['cache_lifetime, cache_key e cache_tags','acl.xml, menu.xml e routes.xml','schema.graphqls e resolver','webapi.xml e token'],a:[0],e:'Blocos cacheaveis precisam de chave, tempo de vida e tags para invalidacao.'},
+{d:'Architecture',t:'EAV',q:'Qual entidade usa fortemente o modelo EAV no Adobe Commerce?',o:['Produto','Sales order item apenas','Admin menu','Cron schedule'],a:[0],e:'Produtos, categorias e clientes usam EAV para atributos flexiveis.'},
+{d:'Architecture',t:'Database',q:'Qual arquivo representa a abordagem moderna de schema declarativo?',o:['etc/db_schema.xml','Setup/InstallSchema.php','etc/schema.php','app/etc/schema.xml'],a:[0],e:'db_schema.xml e o mecanismo declarativo moderno.'},
+{d:'Architecture',t:'Database',q:'Quando usar Data Patch?',o:['Para inserir ou alterar dados de setup, como atributos','Para publicar CSS','Para declarar rota REST','Para limpar Redis'],a:[0],e:'Data patches aplicam mudancas de dados versionadas, como criacao de atributos.'},
+{d:'Architecture',t:'Service Contracts',q:'Por que usar Repository Interfaces em vez de acessar models diretamente?',o:['Porque ignoram cache','Porque formam uma API estavel e desacoplada','Porque rodam somente no admin','Porque substituem a necessidade de banco'],a:[1],e:'Service contracts criam contratos estaveis para integracoes e codigo de dominio.'},
+{d:'Architecture',t:'SearchCriteria',q:'Em SearchCriteria, filtros dentro do mesmo FilterGroup se comportam como:',o:['OR','AND','NOT','ORDER BY'],a:[0],e:'Dentro de um FilterGroup os filtros sao OR; grupos diferentes sao combinados com AND.'},
+{d:'Architecture',t:'Stores',q:'Qual e a hierarquia correta?',o:['Store View -> Website -> Store','Website -> Store -> Store View','Store -> Website -> Store View','Global -> Store View -> Website'],a:[1],e:'Um website contem stores, e stores contem store views.'},
+{d:'Architecture',t:'Stores',q:'Qual escopo fica no topo e pode cascatear configuracoes para os demais?',o:['Store View','Store','Website','Global'],a:[3],e:'Global e o nivel mais alto de configuracao.'},
+{d:'Architecture',t:'Stores',q:'Qual nivel costuma representar idioma/localizacao?',o:['Website','Store View','Root Category','Attribute Set'],a:[1],e:'Store View e normalmente usado para idioma e conteudo localizado.'},
+{d:'Architecture',t:'Stores',q:'SKU diferente por store e uma boa solucao?',o:['Sim, SKU e store-view scoped','Sim, se usar config.xml','Nao, SKU e identificador global','Nao, porque SKU pertence ao cron'],a:[2],e:'SKU e global por design; produtos diferentes exigem SKUs diferentes.'},
+{d:'Architecture',t:'Stores',q:'Se o cliente precisa preco diferente por pais usando websites separados, qual configuracao importa?',o:['Price Scope = Website','Use Categories Path = Yes','Cache Type = layout','Admin route frontName'],a:[0],e:'Preco pode variar por website quando o escopo de preco e Website.'},
+{d:'Architecture',t:'i18n',q:'Qual classe representa frases traduziveis criadas com __()?',o:['Magento\\Framework\\Phrase','Magento\\Framework\\Locale','Magento\\Framework\\I18n','Magento\\Translation\\Text'],a:[0],e:'__() retorna/usa Magento\\Framework\\Phrase no sistema de traducao.'},
+{d:'Architecture',t:'i18n',q:'Qual comando extrai frases traduziveis de um modulo ou tema?',o:['bin/magento i18n:collect-phrases','bin/magento i18n:deploy','bin/magento setup:translation:extract','bin/magento cache:translate'],a:[0],e:'i18n:collect-phrases coleta strings para CSV.'},
+{d:'Architecture',t:'Frontend',q:'Qual layout handle e usado para PDP de produto?',o:['catalog_product_view.xml','catalog_category_view.xml','checkout_cart_index.xml','cms_index_index.xml'],a:[0],e:'catalog_product_view e o handle da pagina de produto.'},
+{d:'Architecture',t:'Frontend',q:'Onde ficam valores padrao de configuracao de um modulo?',o:['etc/config.xml','etc/adminhtml/config.xml','app/etc/config.xml','view/adminhtml/config.xml'],a:[0],e:'etc/config.xml define defaults; etc/adminhtml/config.xml e uma pegadinha, nao existe nesse papel.'},
+{d:'Architecture',t:'Admin',q:'Para limitar acesso a uma pagina admin, qual arquivo define recursos de permissao?',o:['acl.xml','routes.xml','crontab.xml','db_schema.xml'],a:[0],e:'acl.xml declara recursos de permissao usados pelo Admin.'},
+{d:'Architecture',t:'Routing',q:'Qual afirmacao sobre entry point do Admin esta correta?',o:['Admin usa pub/admin.php','Admin routes passam pelo mesmo pub/index.php com base na URL configurada','Admin ignora frontName','Admin so usa GraphQL'],a:[1],e:'Nao ha admin/index.php separado; a requisicao passa pelo entry point normal.'},
+{d:'Architecture',t:'URL Rewrites',q:'Qual e o objetivo principal de URL rewrites?',o:['Trocar senha do admin','Criar URLs amigaveis e SEO sem query strings tecnicas','Compilar DI','Aumentar estoque'],a:[1],e:'URL rewrites mapeiam request_path amigavel para target_path interno.'},
+{d:'Architecture',t:'Attributes',q:'Qual frontend input permite escolher varios valores de um conjunto predefinido?',o:['Dropdown','Multiselect','Text Field','Visual Swatch sempre'],a:[1],e:'Multiselect permite multiplas selecoes.'},
+{d:'Architecture',t:'Layered Navigation',q:'Para uma categoria exibir filtros de subcategorias/produtos, qual configuracao e importante?',o:['Anchor = Yes','SKU = Website','Cron group = index','Cache disabled'],a:[0],e:'Anchor = Yes habilita comportamento de categoria ancora e filtros.'},
+
+{d:'Customizations',t:'Produtos',q:'Em produto configurable, onde fica o estoque real?',o:['No produto pai','Nos produtos simples filhos','No attribute set','No customer group'],a:[1],e:'O estoque e controlado pelos simples associados.'},
+{d:'Customizations',t:'Produtos',q:'Qual tipo permite opcoes como cor/tamanho representadas por simples com SKU proprio?',o:['Virtual','Grouped','Configurable','Downloadable'],a:[2],e:'Configurable combina simples filhos selecionaveis por atributos.'},
+{d:'Customizations',t:'Produtos',q:'Quais tres atributos sao minimos comuns ao criar produto simples programaticamente?',o:['SKU, Name, Price','Cron group, ACL, Route','Token, Website, Coupon','Cache key, Event, Observer'],a:[0],e:'SKU, nome e preco aparecem como base minima no guia; status, visibility, type e attribute set tambem costumam ser definidos.'},
+{d:'Customizations',t:'Produtos',q:'Qual input de atributo e melhor para selecao unica de lista predefinida?',o:['Dropdown','Multiselect','Textarea','Date sempre'],a:[0],e:'Dropdown e a escolha padrao para selecao unica entre opcoes.'},
+{d:'Customizations',t:'Produtos',q:'Related e Up-sell aparecem por padrao em qual contexto?',o:['Pagina de produto','Carrinho','Tela de login','Admin dashboard'],a:[0],e:'PDP normalmente exibe related e up-sell; cross-sell e mais associado ao carrinho.'},
+{d:'Customizations',t:'Produtos',q:'Cross-sell aparece tipicamente onde?',o:['Pagina de produto como principal','Carrinho/checkout como sugestao complementar','Somente no GraphQL schema','Somente no menu admin'],a:[1],e:'Cross-sell e usado para sugestoes no carrinho.'},
+{d:'Customizations',t:'Catalogo',q:'Qual diferenca correta entre State e Status de pedido?',o:['State e rotulo configuravel; Status e fixo interno','State e interno/fixo; Status e rotulo configuravel','Ambos sao atributos de produto','Ambos so existem no quote'],a:[1],e:'State representa estado interno do fluxo; status e label configuravel.'},
+{d:'Customizations',t:'Checkout',q:'Para adicionar um step customizado no checkout, qual area costuma ser alterada?',o:['Layout/JS UI components do checkout','db_schema.xml apenas','acl.xml apenas','routes.xml do Cloud'],a:[0],e:'Checkout e fortemente baseado em UI components/JS e layout.'},
+{d:'Customizations',t:'Checkout',q:'Para criar um total customizado no carrinho, qual mecanismo e usado?',o:['Total collector','URL rewrite','Theme fallback','Cron group'],a:[0],e:'Total collectors entram no fluxo de coleta de totais do quote.'},
+{d:'Customizations',t:'Checkout',q:'Validacao de campo customizado no checkout precisa formato e unicidade no banco. Melhor abordagem?',o:['Somente HTML5 pattern','JS para formato e backend para unicidade','Somente CSS','Somente traducao CSV'],a:[1],e:'Formato pode ser validado no cliente; unicidade deve ser garantida no backend.'},
+{d:'Customizations',t:'Payment',q:'Cliente quer pagar depois da entrega. Qual metodo configurar?',o:['Cash On Delivery','Zero Subtotal Checkout','Bank Transfer sempre','PayPal Express apenas'],a:[0],e:'Cash On Delivery representa pagamento na entrega.'},
+{d:'Customizations',t:'Cart Rules',q:'Qual atributo do item de carrinho e fundamental para limite de desconto por quantidade?',o:['Quantity in cart','Product URL suffix','Admin frontName','Theme locale'],a:[0],e:'Regras de carrinho frequentemente dependem de quantidade no carrinho.'},
+{d:'Customizations',t:'Cart Rules',q:'Que tipos de atributos geralmente NAO aparecem por padrao em condicoes de cart price rules?',o:['System/status como creation date e stock status','Preco relacionado','Categoria de produto','Atributo habilitado para promo rules'],a:[0],e:'Atributos de sistema/status nao costumam estar disponiveis por padrao para essas condicoes.'},
+{d:'Customizations',t:'APIs',q:'Qual arquivo expõe uma rota REST customizada?',o:['webapi.xml','schema.graphqls','events.xml','menu.xml'],a:[0],e:'webapi.xml declara endpoints REST, metodo HTTP, service e resource.'},
+{d:'Customizations',t:'APIs',q:'Qual arquivo define tipos e queries GraphQL customizados?',o:['schema.graphqls','webapi.xml','acl.xml','config.php'],a:[0],e:'GraphQL e definido em schema.graphqls e resolvers.'},
+{d:'Customizations',t:'APIs',q:'Qual autenticacao REST e adequada para endpoint admin protegido?',o:['Admin bearer token','Cookie de visitante anonimo apenas','CSV i18n','Varnish token'],a:[0],e:'Endpoints admin usam token de admin ou integracao com permissao adequada.'},
+{d:'Customizations',t:'GraphQL',q:'Para tornar uma query GraphQL cacheavel, o schema pode declarar:',o:['@cache com cacheIdentity','@cron','@aclOnly','@staticDeploy'],a:[0],e:'O guia mostra @cache(cacheIdentity: "...") para identidade de cache.'},
+{d:'Customizations',t:'SaaS',q:'Qual servico Adobe SaaS fornece recomendacoes de produtos com ML?',o:['Product Recommendations','Redis','Varnish','RabbitMQ'],a:[0],e:'Product Recommendations e um servico SaaS Adobe voltado a recomendacoes.'},
+{d:'Customizations',t:'SaaS',q:'Qual comando sincroniza manualmente um feed SaaS de produtos?',o:['bin/magento saas:resync --feed=products','bin/magento setup:saas:deploy','bin/magento cloud:feed products','bin/magento cache:feed'],a:[0],e:'saas:resync permite ressincronizar feeds especificos.'},
+{d:'Customizations',t:'API Mesh',q:'Para que serve API Mesh no contexto Adobe?',o:['Combinar multiplas APIs em um endpoint GraphQL','Substituir todos os cron jobs','Criar SKUs por store','Limpar cache full page'],a:[0],e:'API Mesh agrega Commerce e APIs externas em uma camada GraphQL unica.'},
+{d:'Customizations',t:'Entidades',q:'Qual objeto representa carrinho antes da conversao em pedido?',o:['Quote','Invoice','Shipment','Credit memo'],a:[0],e:'Quote e o carrinho/orcamento antes de virar order.'},
+{d:'Customizations',t:'Entidades',q:'Extension Attributes sao mais indicados quando voce precisa:',o:['Estender contratos de API sem criar atributo EAV de catalogo','Criar cron schedule','Trocar PHP version no Cloud','Alterar URL suffix'],a:[0],e:'Extension attributes ampliam service contracts e payloads de API.'},
+{d:'Customizations',t:'Quote Modules',q:'Qual modulo fornece extension points e suporte para funcionalidade de configuraveis no quote?',o:['Magento_QuoteConfigurable','Magento_QuoteConfigurableOptions','Magento_CatalogUrlRewrite','Magento_Cron'],a:[0],e:'Essa foi uma pegadinha dos testes: QuoteConfigurable da suporte; QuoteConfigurableOptions gerencia selecoes.'},
+{d:'Customizations',t:'Quote Modules',q:'Qual modulo armazena/gerencia selecoes de opcoes configuraveis no quote?',o:['Magento_QuoteConfigurable','Magento_QuoteConfigurableOptions','Magento_SalesRule','Magento_Store'],a:[1],e:'QuoteConfigurableOptions e o modulo associado ao gerenciamento das opcoes selecionadas.'},
+{d:'Customizations',t:'SEO',q:'Para evitar duplicate content por categoria na URL de produto, qual configuracao ajuda?',o:['Use Categories Path for Product URLs = No','Product URL Suffix = .html obrigatoriamente','Anchor = No sempre','Price Scope = Global'],a:[0],e:'Sem category path, o produto tende a ter URL unica independente da categoria.'},
+{d:'Customizations',t:'Invoice',q:'Criar invoice programaticamente pertence a qual area do fluxo?',o:['Sales/order fulfillment','Store view localization','Theme fallback','Cloud routing'],a:[0],e:'Invoice e entidade de sales relacionada ao faturamento do pedido.'},
+
+{d:'Cloud',t:'Arquitetura Cloud',q:'Qual ambiente Cloud normalmente representa producao real?',o:['Production','Integration','Local only','Sandbox branch sempre'],a:[0],e:'Production e o ambiente de producao; staging/integration servem para validacao e desenvolvimento.'},
+{d:'Cloud',t:'Arquitetura Cloud',q:'Em Cloud, por que jobs longos devem ser quebrados ou movidos para worker?',o:['Porque o ambiente web pode ter restricoes/read-only e apenas um cron por vez no web instance','Porque cron nao existe no Cloud','Porque PHP nao executa CLI','Porque Varnish executa cron'],a:[0],e:'O material da Adobe recomenda tarefas menores/enfileiradas ou worker para cargas longas.'},
+{d:'Cloud',t:'Config Files',q:'Qual arquivo define hooks, runtime, mounts e crons da aplicacao Cloud?',o:['.magento.app.yaml','.magento.env.yaml','routes.yaml','services.yaml'],a:[0],e:'.magento.app.yaml configura a aplicacao, incluindo hooks e runtime.'},
+{d:'Cloud',t:'Config Files',q:'Qual arquivo define variaveis de deploy/build/post-deploy para ece-tools?',o:['.magento.env.yaml','.magento.app.yaml','services.yaml','auth.json'],a:[0],e:'.magento.env.yaml configura variaveis usadas por ece-tools nos cenarios de deploy.'},
+{d:'Cloud',t:'Config Files',q:'Qual arquivo configura servicos como MySQL, Redis, RabbitMQ ou OpenSearch?',o:['services.yaml','routes.yaml','.magento.env.yaml','composer.json'],a:[0],e:'services.yaml descreve servicos provisionados no projeto Cloud.'},
+{d:'Cloud',t:'Config Files',q:'Qual arquivo configura rotas HTTP para a aplicacao?',o:['routes.yaml','services.yaml','db_schema.xml','acl.xml'],a:[0],e:'routes.yaml controla roteamento de entrada no Cloud.'},
+{d:'Cloud',t:'Config Files',q:'Quais dois arquivos sao validos na configuracao Cloud? (Escolha duas.)',o:['.magento.env.yaml','.magento.app.yaml','.magento.deploy.yaml','.magento.config.yaml'],a:[0,1],e:'.magento.env.yaml e .magento.app.yaml sao arquivos validos cobrados nos testes.'},
+{d:'Cloud',t:'CLI Cloud',q:'Qual comando cria snapshot/backup de ambiente no Adobe Commerce Cloud CLI?',o:['magento-cloud snapshot:create','magento-cloud environment:backup','magento-cloud backup:environment','bin/magento cloud:snapshot'],a:[0],e:'A pegadinha recorrente e que environment:backup nao e comando padrao; use snapshot:create.'},
+{d:'Cloud',t:'CLI Cloud',q:'Por que magento-cloud environment:snapshot e incompleto?',o:['Falta o verbo de acao, como create','Usa bin/magento em vez de php','So funciona no admin','Precisa terminar com --flush'],a:[0],e:'A estrutura correta inclui namespace e acao, como snapshot:create.'},
+{d:'Cloud',t:'CLI Cloud',q:'Qual comando lista ambientes no Cloud CLI?',o:['magento-cloud environment:list','magento-cloud envs:all','bin/magento environment:list','magento-cloud project:cron'],a:[0],e:'environment:list e o padrao esperado para listar ambientes.'},
+{d:'Cloud',t:'Seguranca',q:'Onde devem ficar chaves sensiveis como API keys no Cloud?',o:['Variaveis de ambiente seguras, fora do git','Dentro de .magento.app.yaml commitado','Dentro de docs/README.md','No db_schema.xml'],a:[0],e:'Segredos nao devem ir para versionamento; use variaveis seguras do ambiente.'},
+{d:'Cloud',t:'Hooks',q:'Qual hook roda depois do deploy, com app acessivel, bom para warm-up e health checks?',o:['post_deploy','build','deploy','pre_schema'],a:[0],e:'post_deploy ocorre apos deploy e pode executar warm-up, health checks e notificacoes.'},
+{d:'Cloud',t:'Hooks',q:'Em qual hook normalmente rodam setup:upgrade e configuracoes com maintenance mode ativo?',o:['deploy','build','post_deploy','routes'],a:[0],e:'O hook deploy tem acesso a servicos e executa etapas de aplicacao, com maintenance ativo.'},
+{d:'Cloud',t:'PHP Version',q:'Para mudar a versao do PHP usada no ambiente Cloud, qual arquivo tende a ser editado?',o:['.magento.app.yaml','app/etc/env.php','webapi.xml','composer.lock apenas'],a:[0],e:'Runtime como tipo/versao PHP e definido na configuracao da aplicacao Cloud.'},
+{d:'Cloud',t:'Locations',q:'Onde arquivos Cloud costumam ficar no projeto?',o:['Na pasta .magento e/ou arquivos iniciando com .magento. na raiz','Somente em app/code','Somente em vendor/magento','Somente no banco core_config_data'],a:[0],e:'Os testes destacam .magento/ e arquivos .magento.* na raiz.'}
+];
+
+let state={mode:'exam',questions:[],idx:0,answers:[],review:new Set(),checked:new Set(),seconds:0,timerId:null,finished:false};
+
+const $=id=>document.getElementById(id);
+const shuffle=arr=>arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]);
+const byDomain=d=>BANK.filter(q=>q.d===d);
+
+function pickWeighted(count){
+  if(count===50){
+    return [
+      ...shuffle(byDomain('Architecture')).slice(0,26),
+      ...shuffle(byDomain('Customizations')).slice(0,18),
+      ...shuffle(byDomain('Cloud')).slice(0,6)
+    ].sort(()=>Math.random()-.5);
+  }
+  const arch=Math.round(count*.52), cust=Math.round(count*.36), cloud=Math.max(1,count-arch-cust);
+  return [
+    ...shuffle(byDomain('Architecture')).slice(0,arch),
+    ...shuffle(byDomain('Customizations')).slice(0,cust),
+    ...shuffle(byDomain('Cloud')).slice(0,cloud)
+  ].slice(0,count).sort(()=>Math.random()-.5);
+}
+
+function buildQuestions(){
+  const mode=document.querySelector('input[name="mode"]:checked').value;
+  const count=Number($('countSelect').value);
+  const domain=$('domainSelect').value;
+  if(mode==='cloud') return shuffle(byDomain('Cloud')).slice(0,Math.min(count,byDomain('Cloud').length));
+  if(mode==='exam') return pickWeighted(50);
+  if(domain!=='all') return shuffle(byDomain(domain)).slice(0,Math.min(count,byDomain(domain).length));
+  return pickWeighted(count);
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+function start(){
+  clearInterval(state.timerId);
+  state.mode=document.querySelector('input[name="mode"]:checked').value;
+  state.questions=buildQuestions();
+  state.idx=0;
+  state.answers=state.questions.map(()=>[]);
+  state.review=new Set();
+  state.checked=new Set();
+  state.finished=false;
+  const timerMode=$('timerSelect').value;
+  state.seconds=timerMode==='off'?0:Math.round(state.questions.length*120);
+  $('progressBox').style.display='block';
+  $('modeLabel').textContent=state.mode==='exam'?'Prova real':state.mode==='cloud'?'Reforco Cloud':'Treino em tempo real';
+  showScreen('quizScreen');
+  buildNav();
+  render();
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(state.timerId);
+  if($('timerSelect').value==='off'){ $('timer').textContent='sem timer'; return; }
+  tick();
+  state.timerId=setInterval(()=>{
+    state.seconds--;
+    tick();
+    if(state.seconds<=0) finish();
+  },1000);
+}
+
+function tick(){
+  const m=Math.max(0,Math.floor(state.seconds/60));
+  const s=Math.max(0,state.seconds%60);
+  $('timer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function buildNav(){
+  $('navgrid').innerHTML='';
+  state.questions.forEach((_,i)=>{
+    const b=document.createElement('button');
+    b.className='navbtn';
+    b.textContent=i+1;
+    b.onclick=()=>{state.idx=i;render();};
+    $('navgrid').appendChild(b);
+  });
+}
+
+function render(){
+  const q=state.questions[state.idx];
+  $('qNumber').textContent=`${state.idx+1}/${state.questions.length}`;
+  $('qDomain').textContent=q.d;
+  $('qTopic').textContent=q.t;
+  $('qText').textContent=q.q;
+  $('qHint').textContent=q.a.length>1?'Escolha todas as alternativas corretas.':'Escolha uma alternativa.';
+  $('options').innerHTML='';
+  q.o.forEach((text,i)=>{
+    const selected=state.answers[state.idx].includes(i);
+    const checked=state.checked.has(state.idx);
+    const b=document.createElement('button');
+    b.className='option'+(selected?' selected':'');
+    if(checked){
+      if(q.a.includes(i)) b.classList.add('correct');
+      else if(selected) b.classList.add('wrong');
+    }
+    b.innerHTML=`<span class="letter">${String.fromCharCode(65+i)}</span><span>${text}</span>`;
+    b.onclick=()=>selectOption(i);
+    $('options').appendChild(b);
+  });
+  $('feedback').className='feedback';
+  $('feedback').innerHTML='';
+  if(state.checked.has(state.idx)) showFeedback();
+  $('prevBtn').disabled=state.idx===0;
+  $('nextBtn').textContent=state.idx===state.questions.length-1?'Ultima':'Proxima';
+  $('reviewBtn').textContent=state.review.has(state.idx)?'Desmarcar revisao':'Marcar revisao';
+  $('checkBtn').style.display=state.mode==='exam'?'none':'inline-block';
+  updateProgress();
+}
+
+function selectOption(i){
+  const q=state.questions[state.idx];
+  if(state.checked.has(state.idx) && state.mode!=='exam') return;
+  const ans=state.answers[state.idx];
+  if(q.a.length===1){
+    state.answers[state.idx]=[i];
+  }else{
+    state.answers[state.idx]=ans.includes(i)?ans.filter(x=>x!==i):[...ans,i];
+  }
+  render();
+}
+
+function arraysEqual(a,b){
+  const aa=[...a].sort((x,y)=>x-y), bb=[...b].sort((x,y)=>x-y);
+  return aa.length===bb.length && aa.every((v,i)=>v===bb[i]);
+}
+
+function check(){
+  if(!state.answers[state.idx].length) return;
+  state.checked.add(state.idx);
+  render();
+}
+
+function showFeedback(){
+  const q=state.questions[state.idx];
+  const ok=arraysEqual(state.answers[state.idx],q.a);
+  const letters=q.a.map(i=>String.fromCharCode(65+i)).join(', ');
+  $('feedback').className='feedback show '+(ok?'good':'bad');
+  $('feedback').innerHTML=`<strong>${ok?'Correto':'Errado'}.</strong> Resposta: ${letters}. <span class="muted">${q.e}</span>`;
+}
+
+function updateProgress(){
+  const answered=state.answers.filter(a=>a.length).length;
+  $('answeredCount').textContent=`${answered}/${state.questions.length}`;
+  $('reviewCount').textContent=state.review.size;
+  [...$('navgrid').children].forEach((b,i)=>{
+    b.className='navbtn';
+    if(i===state.idx)b.classList.add('active');
+    if(state.answers[i].length)b.classList.add('answered');
+    if(state.review.has(i))b.classList.add('review');
+  });
+}
+
+function finish(){
+  if(state.finished) return;
+  state.finished=true;
+  clearInterval(state.timerId);
+  const total=state.questions.length;
+  const correct=state.questions.reduce((sum,q,i)=>sum+(arraysEqual(state.answers[i],q.a)?1:0),0);
+  const pct=Math.round(correct/total*100);
+  $('scoreText').textContent=`${correct}/${total} (${pct}%)`;
+  $('passText').textContent=pct>=78?'Aprovado no simulado. Meta batida.':'Abaixo da meta de 78%. Revise os erros e rode outro bloco.';
+  renderDomainResults();
+  localStorage.setItem('ad0e724-last',JSON.stringify({date:new Date().toISOString(),correct,total,pct}));
+  $('reviewList').innerHTML='';
+  showScreen('resultScreen');
+}
+
+function renderDomainResults(){
+  const domains=['Architecture','Customizations','Cloud'];
+  $('domainResults').innerHTML=domains.map(d=>{
+    const qs=state.questions.map((q,i)=>({q,i})).filter(x=>x.q.d===d);
+    if(!qs.length)return '';
+    const ok=qs.filter(x=>arraysEqual(state.answers[x.i],x.q.a)).length;
+    const pct=Math.round(ok/qs.length*100);
+    return `<div class="result-card"><div class="muted">${d}</div><h3>${ok}/${qs.length} (${pct}%)</h3></div>`;
+  }).join('');
+}
+
+function reviewWrong(){
+  const wrong=state.questions.map((q,i)=>({q,i})).filter(x=>!arraysEqual(state.answers[x.i],x.q.a));
+  $('reviewList').innerHTML=wrong.length?wrong.map(({q,i})=>{
+    const your=state.answers[i].length?state.answers[i].map(n=>String.fromCharCode(65+n)).join(', '):'sem resposta';
+    const right=q.a.map(n=>String.fromCharCode(65+n)).join(', ');
+    return `<div class="review-item"><strong>${i+1}. ${q.q}</strong><div class="muted">Sua: ${your} | Correta: ${right}</div><div>${q.e}</div></div>`;
+  }).join(''):'<p class="muted">Nenhum erro nesta rodada.</p>';
+}
+
+$('startBtn').onclick=start;
+$('checkBtn').onclick=check;
+$('prevBtn').onclick=()=>{if(state.idx>0){state.idx--;render();}};
+$('nextBtn').onclick=()=>{if(state.idx<state.questions.length-1){state.idx++;render();}};
+$('reviewBtn').onclick=()=>{state.review.has(state.idx)?state.review.delete(state.idx):state.review.add(state.idx);render();};
+$('finishBtn').onclick=finish;
+$('restartBtn').onclick=()=>{showScreen('setupScreen');$('progressBox').style.display='none';};
+$('reviewWrongBtn').onclick=reviewWrong;
+$('historyBtn').onclick=()=>{
+  const last=localStorage.getItem('ad0e724-last');
+  alert(last?`Ultimo resultado: ${JSON.parse(last).correct}/${JSON.parse(last).total} (${JSON.parse(last).pct}%)`:'Ainda nao tem resultado salvo neste navegador.');
+};
+document.querySelectorAll('input[name="mode"]').forEach(r=>r.onchange=()=>{
+  const mode=document.querySelector('input[name="mode"]:checked').value;
+  $('countSelect').disabled=mode==='exam';
+  $('domainSelect').disabled=mode!=='practice';
+});
+</script>
+</body>
+</html>
