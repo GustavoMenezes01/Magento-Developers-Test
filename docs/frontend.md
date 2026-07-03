@@ -240,6 +240,118 @@ Anchor = "Yes" combina produtos da categoria e das sub-categorias. Ativa os filt
 
 ---
 
+## Layout XML — Instruções Principais
+
+```xml
+<!-- Adicionar bloco dentro de container -->
+<referenceContainer name="content">
+    <block class="Vendor\Module\Block\MyBlock"
+           name="my.block"
+           template="Vendor_Module::my/template.phtml"
+           before="-"
+           after="other.block"/>
+</referenceContainer>
+
+<!-- Modificar bloco existente -->
+<referenceBlock name="product.info.price">
+    <arguments>
+        <argument name="css_class" xsi:type="string">custom-price</argument>
+    </arguments>
+</referenceBlock>
+
+<!-- Remover bloco existente -->
+<referenceBlock name="report.bugs" remove="true"/>
+
+<!-- Mover bloco para outro container -->
+<move element="my.block" destination="header.panel" before="-"/>
+
+<!-- Incluir outro layout handle -->
+<update handle="customer_account"/>
+```
+
+| Instrução | O que faz |
+|---|---|
+| `<referenceContainer>` | Referencia um container existente para adicionar filhos |
+| `<referenceBlock>` | Referencia um bloco existente para modificar |
+| `<block>` | Cria novo bloco |
+| `<container>` | Cria novo container (sem renderização própria) |
+| `<move>` | Move bloco/container para outro pai |
+| `<remove>` | Remove elemento do layout (não renderiza) |
+| `<update handle="..."/>` | Inclui outro handle no contexto atual |
+
+---
+
+## Layout XML — `before` e `after`
+
+| Valor | Efeito |
+|---|---|
+| `before="-"` | Posiciona **no início** do container |
+| `after="-"` | Posiciona **no final** do container |
+| `before="block.name"` | Posiciona antes do bloco especificado |
+| `after="block.name"` | Posiciona após o bloco especificado |
+
+---
+
+## Rotas Frontend e Admin
+
+```xml
+<!-- etc/frontend/routes.xml -->
+<config>
+    <router id="standard">
+        <route id="vendor_module" frontName="my-route">
+            <module name="Vendor_Module"/>
+        </route>
+    </router>
+</config>
+```
+
+```xml
+<!-- etc/adminhtml/routes.xml -->
+<config>
+    <router id="admin">
+        <route id="vendor_module_admin" frontName="vendor-module">
+            <module name="Vendor_Module" before="Magento_Backend"/>
+        </route>
+    </router>
+</config>
+```
+
+| Área | `router id` | Controller base |
+|---|---|---|
+| Frontend | `standard` | `Magento\Framework\App\Action\Action` |
+| Admin | `admin` | `Magento\Backend\App\Action` |
+
+> Controller admin **deve** herdar de `Magento\Backend\App\Action` e implementar `_isAllowed()` para controle de ACL.
+
+---
+
+## ACL no Admin
+
+```xml
+<!-- etc/acl.xml -->
+<config>
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Vendor_Module::main" title="My Module" sortOrder="100">
+                    <resource id="Vendor_Module::config" title="Configuration" sortOrder="10"/>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>
+```
+
+```php
+// No controller admin
+protected function _isAllowed(): bool
+{
+    return $this->_authorization->isAllowed('Vendor_Module::main');
+}
+```
+
+---
+
 ## Product Recommendations (PDP vs Cart)
 
 | Tipo | Onde aparece | Objetivo |

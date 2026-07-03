@@ -46,6 +46,21 @@ app/code/Vendor/ModuleName/
 
 ---
 
+## registration.php vs module.xml — O Que Cada Um Faz
+
+> Pergunta frequente: "O módulo não é reconhecido. Qual arquivo está faltando?"
+
+| Arquivo | Papel | Sem ele... |
+|---|---|---|
+| **`registration.php`** | **Registra** o módulo no framework em runtime — ponto de entrada | Magento não sabe que o módulo existe |
+| **`etc/module.xml`** | **Declara** nome, versão e sequência — metadados | Magento encontra o módulo mas não sabe o nome |
+
+> `registration.php` é o primeiro arquivo lido. `etc/module.xml` só é processado depois que o módulo já foi registrado.  
+> **"Módulo não reconhecido"** → `registration.php`.  
+> **"Dependências não respeitadas"** → `etc/module.xml` (sequence).
+
+---
+
 ## registration.php
 
 **Obrigatório** — sem este arquivo o Magento ignora completamente o módulo.

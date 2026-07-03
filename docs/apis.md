@@ -140,6 +140,62 @@ class Products implements ResolverInterface
 
 ---
 
+## GraphQL — Convenções Importantes
+
+### Naming do módulo
+
+```
+{Vendor}_{Module}GraphQl   ← sufixo obrigatório
+```
+
+```
+Vendor/
+└── MyModuleGraphQl/       ← nome do diretório
+    ├── registration.php
+    ├── etc/
+    │   ├── module.xml
+    │   └── schema.graphqls   ← DEVE estar aqui
+    └── Model/
+        └── Resolver/
+            └── MyResolver.php
+```
+
+> Armadilha: `schema.graphqls` em `etc/frontend/` ou `etc/adminhtml/` — **não funciona**. Deve estar em `etc/` (global).
+
+### Tipos de operação GraphQL
+
+| Tipo | Descrição | Autenticação |
+|---|---|---|
+| `query` | Leitura de dados | Opcional (depende do tipo) |
+| `mutation` | Escrita/modificação | Geralmente requer token |
+
+### Cache no GraphQL
+
+```graphql
+type Query {
+    myQuery: MyType
+        @resolver(class: "Vendor\\Module\\Model\\Resolver\\MyResolver")
+        @cache(cacheIdentity: "Vendor\\Module\\Model\\Resolver\\MyIdentity")
+}
+```
+
+A classe de identidade implementa `Magento\Framework\GraphQl\Query\Resolver\IdentityInterface` e define as cache tags para invalidação.
+
+---
+
+## REST — Método HTTP e Operação
+
+| HTTP Method | Operação CRUD | Comportamento |
+|---|---|---|
+| `GET` | Read | Busca dados, sem body |
+| `POST` | Create | Cria novo recurso |
+| `PUT` | Update (completo) | Substitui o recurso inteiro |
+| `DELETE` | Delete | Remove o recurso |
+
+> **Armadilha:** `PUT` substitui o recurso inteiro. Para updates parciais em alguns endpoints, usar `POST`.
+
+---
+
 ## Adobe SaaS Services
 
 | Serviço | Função |

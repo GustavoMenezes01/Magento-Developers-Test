@@ -38,7 +38,7 @@ bin/magento indexer:set-mode realtime catalog_category_product
 | **`customer_grid`** | **Grid de customers no Admin** | **Update on Save apenas** |
 | `inventory` | Estoque multi-source | Ambos |
 
-> **`customer_grid`** é o único indexer que suporta **apenas "Update on Save"** — não suporta "Update by Schedule". Pergunta frequente no exame.
+> **`customer_grid`** historicamente suportava **apenas "Update on Save"**. A partir do **Magento 2.4.8**, passou a suportar ambos os modos (defaultando para "Update by Schedule"). Em versões anteriores, é o único indexer que não suportava agendamento — essa distinção ainda é cobrada no exame para versões 2.4.x anteriores à 2.4.8.
 
 ---
 
@@ -159,6 +159,56 @@ Entity-Attribute-Value é o modelo de dados usado por **produto, categoria e cli
 
 ---
 
+## Arquitetura de Modelos — Data / Resource / Collection / View
+
+> Questão frequente: identificar qual model faz o quê.
+
+| Model | O que é | Herda de |
+|---|---|---|
+| **Data Model** | Representa **uma entidade individual** + contém **business logic** + delega DB ao Resource Model | `AbstractModel` |
+| **Resource Model** | Executa **operações de banco** diretamente (SQL CRUD) | `AbstractDb` |
+| **Collection** | Busca **múltiplos registros** com filtros, ordenação, paginação | `AbstractCollection` |
+| **View Model** | Fornece dados para o **template/view** — sem acesso a banco | Qualquer classe injetável |
+
+```
+Data Model (MyEntity)
+├── setName(), getName()
+├── validate()          ← business logic aqui
+└── → delega save/load ao Resource Model
+
+Resource Model (MyEntityResource)
+├── _construct()        ← define tabela e primary key
+└── executa SQL (INSERT, UPDATE, SELECT, DELETE)
+
+Collection (MyEntityCollection)
+└── retorna lista filtrada de Data Models
+```
+
+```php
+// Data Model — representa UMA entidade
+class MyEntity extends \Magento\Framework\Model\AbstractModel
+{
+    protected function _construct(): void
+    {
+        $this->_init(\Vendor\Module\Model\ResourceModel\MyEntity::class);
+    }
+}
+
+// Resource Model — acessa o banco
+class MyEntity extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
+{
+    protected function _construct(): void
+    {
+        $this->_init('vendor_module_entity', 'entity_id'); // tabela, PK
+    }
+}
+```
+
+> "Representa registro individual, contém business logic, delega DB" → **Data Model**.  
+> "Executa operações de banco diretamente" → **Resource Model**.
+
+---
+
 ## Declarative Schema
 
 Forma moderna de definir e alterar estrutura de banco de dados. O Magento compara o estado declarado com o estado atual e aplica apenas as diferenças.
@@ -238,6 +288,68 @@ class AddInitialData implements DataPatchInterface
     }
 }
 ```
+
+---
+
+## Schema Patch vs Data Patch — Diferença
+
+| | Data Patch | Schema Patch |
+|---|---|---|
+| Interface | `DataPatchInterface` | `SchemaPatchInterface` |
+| Localização | `Setup/Patch/Data/` | `Setup/Patch/Schema/` |
+| Executado via | `setup:upgrade` | `setup:upgrade` |
+| O que faz | Insere/atualiza **dados** | Modificações DDL complexas |
+| Quando usar | Seeds, migração de dados, criar atributos EAV | Conversão de tipo de coluna, operações não suportadas pelo `db_schema.xml` |
+| Alternativa preferida | — | Usar `db_schema.xml` sempre que possível |
+
+```
+patch_list (tabela) — rastreia todos os patches já executados
+├── Data\AddInitialData          ← executado, não roda de novo
+├── Data\MigrateCustomerField    ← executado
+└── Schema\ConvertColumnType     ← executado
+```
+
+> Um patch registrado em `patch_list` **nunca roda novamente**, mesmo que o código mude. Para re-executar, deletar a linha da tabela (desenvolvimento) ou criar um novo patch.
+
+---
+
+## EAV — Frontend, Source, Backend Models
+
+| Model | Interface | O que faz |
+|---|---|---|
+| **Frontend Model** | `Magento\Eav\Model\Entity\Attribute\Frontend\AbstractFrontend` | Controla como o valor é **exibido** |
+| **Source Model** | `Magento\Eav\Model\Entity\Attribute\Source\AbstractSource` | Fornece as **opções** de um `select` ou `multiselect` |
+| **Backend Model** | `Magento\Eav\Model\Entity\Attribute\Backend\AbstractBackend` | Valida e processa o valor **antes de salvar** |
+
+```php
+// Source model — fornece opções para dropdown
+class Status extends AbstractSource
+{
+    public function getAllOptions(): array
+    {
+        return [
+            ['value' => 1, 'label' => __('Active')],
+            ['value' => 0, 'label' => __('Inactive')],
+        ];
+    }
+}
+```
+
+> **Armadilha:** Source model é obrigatório para atributos do tipo `select` e `multiselect`. Sem ele, as opções não aparecem.
+
+---
+
+## EAV — Flat Tables vs EAV
+
+| | EAV | Flat Table |
+|---|---|---|
+| Estrutura | Múltiplas tabelas por tipo de dado | Uma tabela com uma coluna por atributo |
+| Performance de leitura | Mais lenta (muitos JOINs) | Rápida |
+| Flexibilidade | Alta (atributos customizáveis) | Baixa (mudança de schema necessária) |
+| Quando Magento usa | Produto, categoria, cliente | Gerado pelo indexer `catalog_product_flat` |
+| Como habilitar flat | Stores → Config → Catalog → Storefront → Use Flat Catalog | — |
+
+> O indexer `catalog_product_flat` desnormaliza os dados EAV em uma tabela flat para performance de leitura no frontend.
 
 ---
 

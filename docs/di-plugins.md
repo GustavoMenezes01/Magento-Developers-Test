@@ -399,6 +399,51 @@ class MyService
 
 ---
 
+## Plugins — Limitações Completas
+
+Plugins **não funcionam** em:
+
+| Situação | Motivo |
+|---|---|
+| Métodos `final` | Não podem ser sobrescritos |
+| Métodos `private` | Não visíveis externamente |
+| Métodos `static` | Sem polimorfismo de instância |
+| Construtores `__construct` | DI não intercepta |
+| Classes com `final` na declaração | Não podem ter subclasses (interceptors) |
+| Virtual Types | Não são classes reais, não geram interceptors |
+
+> **Regra do exame:** Se precisar interceptar um método `final`, `private`, `static` ou o `__construct` → use **Preference** (último recurso).
+
+---
+
+## sortOrder — Ordem de Execução entre Plugins
+
+Quando múltiplos plugins interceptam o mesmo método:
+
+```xml
+<type name="Magento\Catalog\Model\Product">
+    <plugin name="plugin_a" type="..." sortOrder="10"/>
+    <plugin name="plugin_b" type="..." sortOrder="20"/>
+    <plugin name="plugin_c" type="..." sortOrder="10"/> <!-- mesmo sortOrder: ordem indeterminada -->
+</type>
+```
+
+**Ordem de execução:**
+
+```
+before (sortOrder ASC) → método original → after (sortOrder DESC)
+```
+
+| Tipo | Execução |
+|---|---|
+| `before` | Menor sortOrder executa **primeiro** |
+| `after` | Menor sortOrder executa **por último** (reverso) |
+| `around` | Menor sortOrder é o mais externo |
+
+> `around` com sortOrder 10 envolve o `around` com sortOrder 20: `A_before → B_before → original → B_after → A_after`
+
+---
+
 ## Desabilitar Plugin de Outro Módulo
 
 Para desativar um plugin de terceiro sem remover o código:

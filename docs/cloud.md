@@ -308,6 +308,31 @@ O `ece-tools` orquestra o deploy via cenários XML. Cada cenário é uma sequên
 
 ---
 
+## Customizar Cenários de Deploy (ECE-Tools)
+
+Para sobrescrever um step do deploy sem modificar o `ece-tools`:
+
+```yaml
+# .magento.app.yaml
+hooks:
+    deploy: |
+        php ./vendor/bin/ece-tools run scenario/deploy.xml vendor/module/etc/custom-deploy.xml
+```
+
+```xml
+<!-- vendor/module/etc/custom-deploy.xml -->
+<scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:ece-tools:config/scenario.xsd">
+    <step name="my-custom-step"
+          type="Vendor\Module\Step\CustomStep"
+          priority="200"/>
+</scenario>
+```
+
+> Múltiplos XML no mesmo comando são **mergeados** pelo ece-tools. Steps com o mesmo `name` sobrescrevem o original.
+
+---
+
 ## Hooks de Deploy
 
 | Hook | Acesso a serviços? | Tráfego servido? | Uso típico |

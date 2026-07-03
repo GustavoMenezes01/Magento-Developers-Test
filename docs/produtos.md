@@ -160,7 +160,18 @@ Attribute Set "Roupas"
 
 ### Tier Price (Preço por Quantidade)
 
-> Preço por unidade **diminui** conforme a quantidade **aumenta**.
+> Preço **por unidade** diminui conforme a quantidade aumenta. O **total ainda cresce** — só o valor unitário cai.
+
+**Armadilha de exame:**
+```
+Cart com 1 item  (R$20/un): total = R$20
+Cart com 5 itens (R$15/un): total = R$75  ← total MAIOR, mas preço/un MENOR
+```
+
+| Pergunta do exame | Resposta correta |
+|---|---|
+| "O que acontece ao adicionar mais itens com tier pricing?" | **O preço por unidade diminui** |
+| "O total diminui com mais itens?" | **Não** — o total ainda sobe |
 
 ```php
 $product->setTierPrices([

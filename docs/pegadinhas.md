@@ -579,6 +579,306 @@ O schedule de um cron job pode vir de dois lugares:
 
 ---
 
+## Plugin `after` — Não Pode Retornar `null`
+
+| Plugin | Retorno `null` | Efeito |
+|---|---|---|
+| `before` | `null` | Argumentos **não são alterados** — correto |
+| `after` | `null` | **Substitui o resultado original por `null`** — bug silencioso! |
+
+```php
+// ERRADO: after plugin retornando null "para não fazer nada"
+public function afterGetName(Product $subject, ?string $result): ?string
+{
+    $this->logger->info('called');
+    return null; // BUG — product->getName() vai retornar null para todos!
+}
+
+// CORRETO: retornar $result inalterado
+public function afterGetName(Product $subject, ?string $result): ?string
+{
+    $this->logger->info('called');
+    return $result; // mantém o valor original
+}
+```
+
+> Diferença crítica do exame: `before` pode retornar `null` sem efeitos. `after` **não pode** — `null` substitui o retorno.
+
+---
+
+## Plugin em Método Void — Atenção
+
+Se o método original tem retorno `void`, o plugin `after` **não deve retornar nada** (ou retornar `null` explicitamente, pois não há resultado para modificar).
+
+```php
+// Método original: public function process(): void
+
+// CORRETO: after de método void não tem $result
+public function afterProcess(MyClass $subject): void
+{
+    // sem retorno
+}
+```
+
+---
+
+## Plugin Dentro do Próprio Módulo — Evitar
+
+> Plugins **não devem** ser usados para interceptar métodos dentro do próprio módulo.
+
+Para lógica interna, use:
+- Herança direta
+- Eventos internos
+- Refatorar para um Service
+
+Plugins são para **modificar comportamento de classes de outros módulos** sem alterar o código original.
+
+---
+
+## Virtual Type — Atributo `shared`
+
+```xml
+<!-- shared="true" (padrão): singleton — mesma instância para todos que injetam -->
+<virtualType name="Vendor\Module\Model\CustomLogger"
+             type="Magento\Framework\Logger\Monolog"
+             shared="true">
+    <arguments>
+        <argument name="name" xsi:type="string">my_channel</argument>
+    </arguments>
+</virtualType>
+
+<!-- shared="false": nova instância para cada ponto de injeção -->
+<virtualType name="Vendor\Module\Model\CustomLogger"
+             type="Magento\Framework\Logger\Monolog"
+             shared="false">
+```
+
+| `shared` | Comportamento | Uso |
+|---|---|---|
+| `true` (padrão) | **Singleton** — reutiliza a mesma instância | Serviços stateless |
+| `false` | Nova instância por ponto de injeção | Quando precisa de estado isolado |
+
+---
+
+## Container vs Block — Atributo Obrigatório
+
+| Elemento | Atributo obrigatório | Atributo de renderização |
+|---|---|---|
+| `<container>` | `name` | Não renderiza — apenas agrupa |
+| `<block>` | `name` + `class` | Renderiza via template PHP |
+
+```xml
+<!-- Container: só precisa de name -->
+<container name="product.info.main" htmlTag="div" htmlClass="product-info-main"/>
+
+<!-- Block: precisa de name E class -->
+<block class="Magento\Catalog\Block\Product\View" name="product.info" template="Magento_Catalog::product/view.phtml"/>
+```
+
+> Armadilha: block sem `class` declarado não renderiza e não gera erro imediato — falha silenciosamente.
+
+---
+
+## `<update handle="..."/>` — Incluir Layout Handle
+
+Para reutilizar um layout handle dentro de outro:
+
+```xml
+<!-- catalog_product_view.xml -->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <update handle="customer_account"/>  <!-- inclui TODOS os blocos daquele handle -->
+</layout>
+```
+
+> `<update handle="..."/>` inclui o conteúdo de outro handle no contexto atual. Não é para aplicar layout de outra página — é para reutilizar handles utilitários.
+
+---
+
+## Schema Patch vs Data Patch
+
+| | Schema Patch | Data Patch |
+|---|---|---|
+| Interface | `SchemaPatchInterface` | `DataPatchInterface` |
+| Localização | `Setup/Patch/Schema/` | `Setup/Patch/Data/` |
+| O que faz | Modificações complexas de schema (impossíveis no `db_schema.xml`) | Inserção/atualização de dados |
+| Acesso a BD | Via `SchemaSetupInterface` | Via `ModuleDataSetupInterface` |
+| Quando usar | Conversão de dados de coluna, operações DDL complexas | Seeds, migração de dados, criação de atributos |
+
+> Preferir `db_schema.xml` para DDL sempre que possível. Schema Patch só para casos que o XML declarativo não suporta.
+
+---
+
+## Order State — Apenas via Setup Script
+
+| | Status | State |
+|---|---|---|
+| O que é | Rótulo visível e configurável | Estado interno do sistema |
+| Pode adicionar via Admin? | **✅ Sim** — Stores → Order Status | **❌ Não** — apenas via código |
+| Pode adicionar via código? | ✅ Sim | ✅ Sim (setup script) |
+| Quantidade | Ilimitada | ~8 valores fixos no core |
+
+> "O dev quer um status personalizado" → Admin panel. "O dev quer um state personalizado" → setup script, não tem interface no admin.
+
+---
+
+## registration.php vs etc/module.xml — Diferença Crítica
+
+| Arquivo | O que faz | Sem ele... |
+|---|---|---|
+| `registration.php` | **Registra o módulo no framework em runtime** — diz ao Magento onde o módulo existe | Magento não encontra o módulo — como se não existisse |
+| `etc/module.xml` | Declara **nome, versão e dependências** do módulo | Magento encontra o módulo mas não sabe o nome nem dependências |
+
+> **"O módulo não é reconhecido pelo sistema"** → problema em `registration.php`.  
+> `etc/module.xml` só é lido **depois** que o módulo já está registrado via `registration.php`.
+
+```php
+// registration.php — obrigatório em todo módulo
+<?php
+use Magento\Framework\Component\ComponentRegistrar;
+
+ComponentRegistrar::register(
+    ComponentRegistrar::MODULE,
+    'Vendor_ModuleName',
+    __DIR__
+);
+```
+
+---
+
+## Tier Pricing (Preço por Quantidade) — O que muda
+
+> Quando o cliente aumenta a quantidade no carrinho com tier pricing configurado:
+
+| O que muda | O que NÃO muda |
+|---|---|
+| **Preço por unidade** (cai) | O total ainda aumenta com mais itens |
+
+```
+Produto: R$100/unidade
+Tier: 5+ unidades → R$80/unidade
+
+Cart com 1 item:  total = R$100  (R$100 × 1)
+Cart com 5 itens: total = R$400  (R$80 × 5) ← total MAIOR, mas por unidade é MENOR
+```
+
+> **Armadilha do exame:** "O total diminui" — **ERRADO**. O total ainda cresce. O que cai é o **preço por unidade**.
+
+---
+
+## Modelos no Magento — Data vs Resource vs Collection vs View
+
+| Modelo | Responsabilidade | Herda de |
+|---|---|---|
+| **Data Model** | Representa **uma entidade**, contém **business logic**, delega persistência ao Resource Model | `Magento\Framework\Model\AbstractModel` |
+| **Resource Model** | Executa operações de **banco de dados** (CRUD SQL) | `Magento\Framework\Model\ResourceModel\Db\AbstractDb` |
+| **Collection** | Busca e filtra **múltiplos registros** | `Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection` |
+| **View Model** | Fornece dados para o **template** sem lógica de negócio | Qualquer classe injetável |
+
+```
+Data Model        → tem setName(), getName(), business rules
+    ↓ delega
+Resource Model    → executa INSERT, UPDATE, SELECT, DELETE
+    ↓ usado por
+Collection        → SELECT com filtros, paginação, ordenação
+```
+
+> "Representa registro individual e contém business logic enquanto delega DB a outro" → **Data Model**.  
+> "Executa operações de banco diretamente" → **Resource Model**.
+
+---
+
+## Customer Segments — Condições Disponíveis
+
+> Pergunta frequente: quais atributos podem ser usados como condições em Customer Segments?
+
+| Condição | Disponível? |
+|---|---|
+| **Email** | ✅ Sim |
+| **Date of Birth** | ✅ Sim |
+| **Gender** | ✅ Sim |
+| **Group** | ✅ Sim |
+| Purchase History / Orders | ✅ Sim (via condição de histórico) |
+| Password | ❌ Não — dado sensível |
+| Company or Residential | ❌ Não existe como atributo padrão |
+| Purchase Total (como atributo direto) | ❌ Não — é valor agregado |
+
+> **Armadilha:** "Company or Residential" não existe como atributo padrão do Adobe Commerce. "Purchase Total" como condição direta de atributo não existe — compras são condições de comportamento, não de atributo.
+
+---
+
+## Grouped vs Bundle — Diferença de Compra
+
+| | Grouped | Bundle |
+|---|---|---|
+| Composição | Produtos simples **independentes** agrupados | Kit configurável — itens são parte do bundle |
+| Compra | Cada item pode ser comprado **separadamente** | Comprado como **um único produto** |
+| Cart | Múltiplos line items (um por produto filho) | **Um único line item** no carrinho |
+| Preço | Cada filho tem seu próprio preço | Preço do bundle (pode ser dinâmico) |
+| Quantidade por filho | Cliente informa quantidade individualmente | Depende das opções do bundle |
+
+```
+Grouped: "Kit de facas" → cliente coloca 2 unid. da faca P + 1 da faca G → 2 line items no cart
+Bundle:  "PC Gamer"    → cliente escolhe RAM + GPU   → 1 line item "PC Gamer" no cart
+```
+
+---
+
+## GraphQL — Naming Convention do Módulo
+
+Módulos GraphQL seguem convenção de nome obrigatória:
+
+```
+{Vendor}_{Module}GraphQl
+```
+
+```
+Magento_CatalogGraphQl    ← módulo do catálogo
+Magento_CustomerGraphQl   ← módulo do customer
+Vendor_MyModuleGraphQl    ← seu módulo customizado
+```
+
+O arquivo `schema.graphqls` deve estar em `etc/` do módulo GraphQl:
+
+```
+Vendor/MyModuleGraphQl/
+├── etc/
+│   └── schema.graphqls    ← CORRETO
+└── Model/Resolver/
+    └── MyResolver.php
+```
+
+> Armadilha: colocar `schema.graphqls` no módulo principal (sem o sufixo `GraphQl`) — tecnicamente funciona mas vai contra a convenção que o exame cobra.
+
+---
+
+## cron_groups.xml vs crontab.xml
+
+| Arquivo | O que define |
+|---|---|
+| `etc/crontab.xml` | Os **jobs** individuais (nome, classe, método, schedule) |
+| `etc/cron_groups.xml` | As **propriedades do grupo** (timeout, max_messages, etc.) |
+
+```xml
+<!-- etc/cron_groups.xml — define propriedades do grupo customizado -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/cron_groups.xsd">
+    <group id="vendor_custom">
+        <schedule_generate_every>1</schedule_generate_every>
+        <schedule_ahead_for>4</schedule_ahead_for>
+        <schedule_lifetime>2</schedule_lifetime>
+        <history_cleanup_every>10</history_cleanup_every>
+        <history_success_lifetime>60</history_success_lifetime>
+        <history_failure_lifetime>600</history_failure_lifetime>
+        <use_separate_process>1</use_separate_process>
+    </group>
+</config>
+```
+
+> Grupos padrão do Magento: `default`, `index`, `consumers`. Você pode criar grupos customizados para isolar seus jobs.
+
+---
+
 ## Configurable Product — Requisitos do Super Attribute
 
 Para um atributo ser usado como opção de variação (super attribute) em produto Configurable:
